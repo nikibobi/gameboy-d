@@ -6,6 +6,7 @@ __dummy.html
 
 dub.selections.json
 gameboy
+__test__library__
 *.txt
 roms/*
 dsfml/*
