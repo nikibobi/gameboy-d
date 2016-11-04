@@ -1,0 +1,10 @@
+{
+	"name": "gameboy",
+	"description": "Gameboy emulator",
+	"copyright": "Copyright © 2016, bosak",
+	"authors": ["bosak"],
+	"lflags" : ["-L/usr/local/lib"],
+	"dependencies": {
+		"dsfml": "~>2.1.1"
+	}
+}
