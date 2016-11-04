@@ -50,26 +50,26 @@ size_t TB(size_t n) {
     return n.GB * 1024;
 }
 
-template bit(size_t n) {
+template bitness(size_t n) {
     static if (n <= 8) {
-        alias bit = ubyte;
+        alias bitness = ubyte;
     }
     else static if (n <= 16) {
-        alias bit = ushort;
+        alias bitness = ushort;
     }
     else static if (n <= 32) {
-        alias bit = uint;
+        alias bitness = uint;
     }
     else static if (n <= 64) {
-        alias bit = ulong;
+        alias bitness = ulong;
     }
 }
 
 unittest {
-    assert(is(bit!4 == ubyte));
-    assert(is(bit!8 == ubyte));
-    assert(is(bit!16 == ushort));
-    assert(is(bit!24 == uint));
-    assert(is(bit!32 == uint));
-    assert(is(bit!64 == ulong));
+    assert(is(bitness!4 == ubyte));
+    assert(is(bitness!8 == ubyte));
+    assert(is(bitness!16 == ushort));
+    assert(is(bitness!24 == uint));
+    assert(is(bitness!32 == uint));
+    assert(is(bitness!64 == ulong));
 }

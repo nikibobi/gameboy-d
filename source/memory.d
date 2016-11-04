@@ -19,7 +19,7 @@ interface ReadWrite : ReadOnly, WriteOnly
 
 class Memory(size_t bits)
 {
-    alias bit!bits T;
+    alias bitness!bits T;
     enum max = 1L << bits;
 
     this() {

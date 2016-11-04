@@ -5,7 +5,7 @@ import std.conv;
 import std.string : indexOf;
 import std.format : format;
 import gameboy.memory;
-import gameboy.utils : bit, isPowerOf2;
+import gameboy.utils : bitness, isPowerOf2;
 
 struct Instruction
 {
@@ -44,7 +44,7 @@ struct Instruction
 class CPU(size_t bits, string registers)
 if (bits.isPowerOf2)
 {
-    alias bit!bits T;
+    alias bitness!bits T;
 
     this(Memory!(bits * 2) mem) {
         this.mem = mem;
@@ -57,7 +57,7 @@ if (bits.isPowerOf2)
         } else static if (select == "sp") {
             return sp;
         } else {
-            bit!(select.length * bits) res = 0;
+            bitness!(select.length * bits) res = 0;
             foreach (i, r; select) {
                 auto shift = (select.length - i - 1) * bits;
                 res |= cast(typeof(res))regs[r] << shift;
@@ -83,7 +83,7 @@ if (bits.isPowerOf2)
     }
 
     @property
-    void reg(string select)(bit!(select.length * bits) value) {
+    void reg(string select)(bitness!(select.length * bits) value) {
         static if (select == "pc") {
             pc = value;
         } else static if (select == "sp") {
@@ -114,7 +114,7 @@ protected:
 
 private:
     T[char] regs;
-    bit!(bits * 2) pc, sp;
+    bitness!(bits * 2) pc, sp;
     Memory!(bits * 2) mem;
 }
 
