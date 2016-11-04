@@ -73,3 +73,33 @@ unittest {
     assert(is(bitness!32 == uint));
     assert(is(bitness!64 == ulong));
 }
+
+template bit(size_t offset, T) {
+    @property
+    T bit(T value)
+    out(bit) {
+        assert(bit == 0 || bit == 1);
+    } body {
+        value >>= offset; //move the bit to be first
+        value &= 1; //mask with 1 to get the bit
+        return value;
+    }
+
+    @property
+    void bit(ref T value, size_t bit)
+    in {
+        assert(bit == 0 || bit == 1);
+    } body {
+        value &= ~(1 << offset); //clear bit at offset
+        value |= bit << offset; //set it to bit at offset
+    }
+}
+
+unittest {
+    assert((0x02).bit!1 == 1);
+    ubyte val = 0b10;
+    val.bit!0 = 1;
+    assert(val == 0b11);
+    val.bit!1 = 0;
+    assert(val == 0b01);
+}

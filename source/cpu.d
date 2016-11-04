@@ -5,7 +5,7 @@ import std.conv;
 import std.string : indexOf;
 import std.format : format;
 import gameboy.memory;
-import gameboy.utils : bitness, isPowerOf2;
+import gameboy.utils : bitness, isPowerOf2, bit;
 
 struct Instruction
 {
@@ -450,15 +450,17 @@ class GameboyCPU : CPU!(8, "abcdefhl")
     @property
     T flag(char f)() inout
     if (flags.indexOf(f) != -1) {
-        auto i = flags.indexOf(f) + 4;
-        return (reg!"f" >> i) & 1;
+        immutable i = flags.indexOf(f) + 4;
+        return reg!"f".bit!i;
     }
 
     @property
     void flag(char f)(T value)
     if (flags.indexOf(f) != -1) {
-        auto i = flags.indexOf(f) + 4;
-        reg!"f" = reg!"f" ^ ((~value ^ reg!"f") & (1 << i));
+        immutable i = flags.indexOf(f) + 4;
+        auto f = reg!"f";
+        f.bit!i = value;
+        reg!"f" = f;
     }
 
     unittest {
