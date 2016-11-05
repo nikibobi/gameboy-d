@@ -65,7 +65,7 @@ class Processor
             0x1E: Instruction("LD E,d8", (ubyte n) { reg!"e" = n; }),
             0x26: Instruction("LD H,d8", (ubyte n) { reg!"h" = n; }),
             0x2E: Instruction("LD L,d8", (ubyte n) { reg!"l" = n; }),
-            0x36: Instruction("LD (HL),d8", (ubyte n) { mem[reg!"hl"] = n; }),
+            0x36: Instruction("LD (HL),d8", (ubyte n) { reg!"(hl)" = n; }),
             0x3E: Instruction("LD A,d8", (ubyte n) { reg!"a" = n; }),
 
             0x40: Instruction("LD B,B", { reg!"b" = reg!"b"; }),
@@ -74,7 +74,7 @@ class Processor
             0x43: Instruction("LD B,E", { reg!"b" = reg!"e"; }),
             0x44: Instruction("LD B,H", { reg!"b" = reg!"h"; }),
             0x45: Instruction("LD B,L", { reg!"b" = reg!"l"; }),
-            0x46: Instruction("LD B,(HL)", { reg!"b" = mem[reg!"hl"]; }),
+            0x46: Instruction("LD B,(HL)", { reg!"b" = reg!"(hl)"; }),
             0x47: Instruction("LD B,A", { reg!"b" = reg!"a"; }),
 
             0x48: Instruction("LD C,B", { reg!"c" = reg!"b"; }),
@@ -83,7 +83,7 @@ class Processor
             0x4B: Instruction("LD C,E", { reg!"c" = reg!"e"; }),
             0x4C: Instruction("LD C,H", { reg!"c" = reg!"h"; }),
             0x4D: Instruction("LD C,L", { reg!"c" = reg!"l"; }),
-            0x4E: Instruction("LD C,(HL)", { reg!"c" = mem[reg!"hl"]; }),
+            0x4E: Instruction("LD C,(HL)", { reg!"c" = reg!"(hl)"; }),
             0x4F: Instruction("LD C,A", { reg!"c" = reg!"a"; }),
 
             0x50: Instruction("LD D,B", { reg!"d" = reg!"b"; }),
@@ -92,7 +92,7 @@ class Processor
             0x53: Instruction("LD D,E", { reg!"d" = reg!"e"; }),
             0x54: Instruction("LD D,H", { reg!"d" = reg!"h"; }),
             0x55: Instruction("LD D,L", { reg!"d" = reg!"l"; }),
-            0x56: Instruction("LD D,(HL)", { reg!"d" = mem[reg!"hl"]; }),
+            0x56: Instruction("LD D,(HL)", { reg!"d" = reg!"(hl)"; }),
             0x57: Instruction("LD D,A", { reg!"d" = reg!"a"; }),
 
             0x58: Instruction("LD E,B", { reg!"e" = reg!"b"; }),
@@ -101,7 +101,7 @@ class Processor
             0x5B: Instruction("LD E,E", { reg!"e" = reg!"e"; }),
             0x5C: Instruction("LD E,H", { reg!"e" = reg!"h"; }),
             0x5D: Instruction("LD E,L", { reg!"e" = reg!"l"; }),
-            0x5E: Instruction("LD E,(HL)", { reg!"e" = mem[reg!"hl"]; }),
+            0x5E: Instruction("LD E,(HL)", { reg!"e" = reg!"(hl)"; }),
             0x5F: Instruction("LD E,A", { reg!"e" = reg!"a"; }),
 
             0x60: Instruction("LD H,B", { reg!"h" = reg!"b"; }),
@@ -110,7 +110,7 @@ class Processor
             0x63: Instruction("LD H,E", { reg!"h" = reg!"e"; }),
             0x64: Instruction("LD H,H", { reg!"h" = reg!"h"; }),
             0x65: Instruction("LD H,L", { reg!"h" = reg!"l"; }),
-            0x66: Instruction("LD H,(HL)", { reg!"h" = mem[reg!"hl"]; }),
+            0x66: Instruction("LD H,(HL)", { reg!"h" = reg!"(hl)"; }),
             0x67: Instruction("LD H,A", { reg!"h" = reg!"a"; }),
             
             0x68: Instruction("LD L,B", { reg!"l" = reg!"b"; }),
@@ -119,16 +119,16 @@ class Processor
             0x6B: Instruction("LD L,E", { reg!"l" = reg!"e"; }),
             0x6C: Instruction("LD L,H", { reg!"l" = reg!"h"; }),
             0x6D: Instruction("LD L,L", { reg!"l" = reg!"l"; }),
-            0x6E: Instruction("LD L,(HL)", { reg!"l" = mem[reg!"hl"]; }),
+            0x6E: Instruction("LD L,(HL)", { reg!"l" = reg!"(hl)"; }),
             0x6F: Instruction("LD L,A", { reg!"l" = reg!"a"; }),
 
-            0x70: Instruction("LD (HL),B", { mem[reg!"hl"] = reg!"b"; }),
-            0x71: Instruction("LD (HL),C", { mem[reg!"hl"] = reg!"c"; }),
-            0x72: Instruction("LD (HL),D", { mem[reg!"hl"] = reg!"d"; }),
-            0x73: Instruction("LD (HL),E", { mem[reg!"hl"] = reg!"e"; }),
-            0x74: Instruction("LD (HL),H", { mem[reg!"hl"] = reg!"h"; }),
-            0x75: Instruction("LD (HL),L", { mem[reg!"hl"] = reg!"l"; }),
-            0x77: Instruction("LD (HL),A", { mem[reg!"hl"] = reg!"a"; }),
+            0x70: Instruction("LD (HL),B", { reg!"(hl)" = reg!"b"; }),
+            0x71: Instruction("LD (HL),C", { reg!"(hl)" = reg!"c"; }),
+            0x72: Instruction("LD (HL),D", { reg!"(hl)" = reg!"d"; }),
+            0x73: Instruction("LD (HL),E", { reg!"(hl)" = reg!"e"; }),
+            0x74: Instruction("LD (HL),H", { reg!"(hl)" = reg!"h"; }),
+            0x75: Instruction("LD (HL),L", { reg!"(hl)" = reg!"l"; }),
+            0x77: Instruction("LD (HL),A", { reg!"(hl)" = reg!"a"; }),
 
             0x78: Instruction("LD A,B", { reg!"a" = reg!"b"; }),
             0x79: Instruction("LD A,C", { reg!"a" = reg!"c"; }),
@@ -136,7 +136,7 @@ class Processor
             0x7B: Instruction("LD A,E", { reg!"a" = reg!"e"; }),
             0x7C: Instruction("LD A,H", { reg!"a" = reg!"h"; }),
             0x7D: Instruction("LD A,L", { reg!"a" = reg!"l"; }),
-            0x7E: Instruction("LD A,(HL)", { reg!"a" = mem[reg!"hl"]; }),
+            0x7E: Instruction("LD A,(HL)", { reg!"a" = reg!"(hl)"; }),
             0x7F: Instruction("LD A,A", { reg!"a" = reg!"a"; }),
 
             0x0A: Instruction("LD A,(BC)", { reg!"a" = mem[reg!"bc"]; }),
@@ -149,10 +149,10 @@ class Processor
             0xF2: Instruction("LD A,(C)", { reg!"a" = mem[0xFF00 + reg!"c"]; }),
             0xE2: Instruction("LD (C),A", { mem[0xFF00 + reg!"c"] = reg!"a"; }),
 
-            0x22: Instruction("LD (HL+),A", { mem[reg!"hl"] = reg!"a"; inc!"hl"; }),
-            0x32: Instruction("LD (HL-),A", { mem[reg!"hl"] = reg!"a"; dec!"hl"; }),
-            0x2A: Instruction("LD A,(HL+)", { reg!"a" = mem[reg!"hl"]; inc!"hl"; }),
-            0x3A: Instruction("LD A,(HL-)", { reg!"a" = mem[reg!"hl"]; dec!"hl"; }),
+            0x22: Instruction("LD (HL+),A", { reg!"(hl)" = reg!"a"; inc!"hl"; }),
+            0x32: Instruction("LD (HL-),A", { reg!"(hl)" = reg!"a"; dec!"hl"; }),
+            0x2A: Instruction("LD A,(HL+)", { reg!"a" = reg!"(hl)"; inc!"hl"; }),
+            0x3A: Instruction("LD A,(HL-)", { reg!"a" = reg!"(hl)"; dec!"hl"; }),
 
             0xE0: Instruction("LDH (a8),A", (ubyte n) { mem[0xFF00 + n] = reg!"a"; }),
             0xF0: Instruction("LDH A,(a8)", (ubyte n) { reg!"a" = mem[0xFF00 + n]; }),
@@ -172,7 +172,7 @@ class Processor
             0x83: Instruction("ADD A,E", { add(reg!"e"); }),
             0x84: Instruction("ADD A,H", { add(reg!"h"); }),
             0x85: Instruction("ADD A,L", { add(reg!"l"); }),
-            0x86: Instruction("ADD A,(HL)", { add(mem[reg!"hl"]); }),
+            0x86: Instruction("ADD A,(HL)", { add(reg!"(hl)"); }),
             0x87: Instruction("ADD A,A", { add(reg!"a"); }),
             0xC6: Instruction("ADD A,d8", &add),
 
@@ -182,7 +182,7 @@ class Processor
             0x8B: Instruction("ADC A,E", { adc(reg!"e"); }),
             0x8C: Instruction("ADC A,H", { adc(reg!"h"); }),
             0x8D: Instruction("ADC A,L", { adc(reg!"l"); }),
-            0x8E: Instruction("ADC A,(HL)", { adc(mem[reg!"hl"]); }),
+            0x8E: Instruction("ADC A,(HL)", { adc(reg!"(hl)"); }),
             0x8F: Instruction("ADC A,A", { adc(reg!"a"); }),
             0xCE: Instruction("ADC A,d8", &adc),
 
@@ -192,7 +192,7 @@ class Processor
             0x93: Instruction("SUB E", { sub(reg!"e"); }),
             0x94: Instruction("SUB H", { sub(reg!"h"); }),
             0x95: Instruction("SUB L", { sub(reg!"l"); }),
-            0x96: Instruction("SUB (HL)", { sub(mem[reg!"hl"]); }),
+            0x96: Instruction("SUB (HL)", { sub(reg!"(hl)"); }),
             0x97: Instruction("SUB A", { sub(reg!"a"); }),
             0xD6: Instruction("SUB d8", &sub),
 
@@ -202,7 +202,7 @@ class Processor
             0x9B: Instruction("SBC A,E", { sbc(reg!"e"); }),
             0x9C: Instruction("SBC A,H", { sbc(reg!"h"); }),
             0x9D: Instruction("SBC A,L", { sbc(reg!"l"); }),
-            0x9E: Instruction("SBC A,(HL)", { sbc(mem[reg!"hl"]); }),
+            0x9E: Instruction("SBC A,(HL)", { sbc(reg!"(hl)"); }),
             0x9F: Instruction("SBC A,A", { sbc(reg!"a"); }),
             0xDE: Instruction("SBC A,d8", &sbc),
 
@@ -212,7 +212,7 @@ class Processor
             0xA3: Instruction("AND E", { and(reg!"e"); }),
             0xA4: Instruction("AND H", { and(reg!"h"); }),
             0xA5: Instruction("AND L", { and(reg!"l"); }),
-            0xA6: Instruction("AND (HL)", { and(mem[reg!"hl"]); }),
+            0xA6: Instruction("AND (HL)", { and(reg!"(hl)"); }),
             0xA7: Instruction("AND A", { and(reg!"a"); }),
             0xE6: Instruction("AND d8", &and),
 
@@ -222,7 +222,7 @@ class Processor
             0xB3: Instruction("OR E", { or(reg!"e"); }),
             0xB4: Instruction("OR H", { or(reg!"h"); }),
             0xB5: Instruction("OR L", { or(reg!"l"); }),
-            0xB6: Instruction("OR (HL)", { or(mem[reg!"hl"]); }),
+            0xB6: Instruction("OR (HL)", { or(reg!"(hl)"); }),
             0xB7: Instruction("OR A", { or(reg!"a"); }),
             0xF6: Instruction("OR d8", &or),
 
@@ -232,7 +232,7 @@ class Processor
             0xAB: Instruction("XOR E", { xor(reg!"e"); }),
             0xAC: Instruction("XOR H", { xor(reg!"h"); }),
             0xAD: Instruction("XOR L", { xor(reg!"l"); }),
-            0xAE: Instruction("XOR (HL)", { xor(mem[reg!"hl"]); }),
+            0xAE: Instruction("XOR (HL)", { xor(reg!"(hl)"); }),
             0xAF: Instruction("XOR A", { xor(reg!"a"); }),
             0xEE: Instruction("XOR d8", &xor),
 
@@ -242,7 +242,7 @@ class Processor
             0xBB: Instruction("CP E", { cp(reg!"e"); }),
             0xBC: Instruction("CP H", { cp(reg!"h"); }),
             0xBD: Instruction("CP L", { cp(reg!"l"); }),
-            0xBE: Instruction("CP (HL)", { cp(mem[reg!"hl"]); }),
+            0xBE: Instruction("CP (HL)", { cp(reg!"(hl)"); }),
             0xBF: Instruction("CP A", { cp(reg!"a"); }),
             0xFE: Instruction("CP d8", &cp),
 
@@ -252,7 +252,7 @@ class Processor
             0x1C: Instruction("INC E", &inc!"e"),
             0x24: Instruction("INC H", &inc!"h"),
             0x2C: Instruction("INC L", &inc!"l"),
-            0x34: Instruction("INC (HL)", { mem[reg!"hl"] = inc(mem[reg!"hl"]); }),
+            0x34: Instruction("INC (HL)", { reg!"(hl)" = inc(reg!"(hl)"); }),
             0x3C: Instruction("INC A", &inc!"a"),
 
             0x05: Instruction("DEC B", &dec!"b"),
@@ -261,7 +261,7 @@ class Processor
             0x1D: Instruction("DEC E", &dec!"e"),
             0x25: Instruction("DEC H", &dec!"h"),
             0x2D: Instruction("DEC L", &dec!"l"),
-            0x35: Instruction("DEC (HL)", { mem[reg!"hl"] = dec(mem[reg!"hl"]); }),
+            0x35: Instruction("DEC (HL)", { reg!"(hl)" = dec(reg!"(hl)"); }),
             0x3D: Instruction("DEC A", &dec!"a"),
 
             0xC1: Instruction("POP BC", { reg!"bc" = pop(); }),
@@ -344,7 +344,7 @@ class Processor
             0x03: Instruction("RLC E", { reg!"e" = rlc(reg!"e"); }),
             0x04: Instruction("RLC H", { reg!"h" = rlc(reg!"h"); }),
             0x05: Instruction("RLC L", { reg!"l" = rlc(reg!"l"); }),
-            0x06: Instruction("RLC (HL)", { mem[reg!"hl"] = rlc(mem[reg!"hl"]); }),
+            0x06: Instruction("RLC (HL)", { reg!"(hl)" = rlc(reg!"(hl)"); }),
             0x07: Instruction("RLC A", { reg!"a" = rlc(reg!"a"); }),
 
             0x08: Instruction("RRC B", { reg!"b" = rrc(reg!"b"); }),
@@ -353,7 +353,7 @@ class Processor
             0x0B: Instruction("RRC E", { reg!"e" = rrc(reg!"e"); }),
             0x0C: Instruction("RRC H", { reg!"h" = rrc(reg!"h"); }),
             0x0D: Instruction("RRC L", { reg!"l" = rrc(reg!"l"); }),
-            0x0E: Instruction("RRC (HL)", { mem[reg!"hl"] = rrc(mem[reg!"hl"]); }),
+            0x0E: Instruction("RRC (HL)", { reg!"(hl)" = rrc(reg!"(hl)"); }),
             0x0F: Instruction("RRC A", { reg!"a" = rrc(reg!"a"); }),
 
             0x10: Instruction("RL B", { reg!"b" = rl(reg!"b"); }),
@@ -362,7 +362,7 @@ class Processor
             0x13: Instruction("RL E", { reg!"e" = rl(reg!"e"); }),
             0x14: Instruction("RL H", { reg!"h" = rl(reg!"h"); }),
             0x15: Instruction("RL L", { reg!"l" = rl(reg!"l"); }),
-            0x16: Instruction("RL (HL)", { mem[reg!"hl"] = rl(mem[reg!"hl"]); }),
+            0x16: Instruction("RL (HL)", { reg!"(hl)" = rl(reg!"(hl)"); }),
             0x17: Instruction("RL A", { reg!"a" = rl(reg!"a"); }),
 
             0x18: Instruction("RR B", { reg!"b" = rr(reg!"b"); }),
@@ -371,7 +371,7 @@ class Processor
             0x1B: Instruction("RR E", { reg!"e" = rr(reg!"e"); }),
             0x1C: Instruction("RR H", { reg!"h" = rr(reg!"h"); }),
             0x1D: Instruction("RR L", { reg!"l" = rr(reg!"l"); }),
-            0x1E: Instruction("RR (HL)", { mem[reg!"hl"] = rr(mem[reg!"hl"]); }),
+            0x1E: Instruction("RR (HL)", { reg!"(hl)" = rr(reg!"(hl)"); }),
             0x1F: Instruction("RR A", { reg!"a" = rr(reg!"a"); }),
 
             0x20: Instruction("SLA B", { reg!"b" = sla(reg!"b"); }),
@@ -380,7 +380,7 @@ class Processor
             0x23: Instruction("SLA E", { reg!"e" = sla(reg!"e"); }),
             0x24: Instruction("SLA H", { reg!"h" = sla(reg!"h"); }),
             0x25: Instruction("SLA L", { reg!"l" = sla(reg!"l"); }),
-            0x26: Instruction("SLA (HL)", { mem[reg!"hl"] = sla(mem[reg!"hl"]); }),
+            0x26: Instruction("SLA (HL)", { reg!"(hl)" = sla(reg!"(hl)"); }),
             0x27: Instruction("SLA A", { reg!"a" = sla(reg!"a"); }),
 
             0x28: Instruction("SRA B", { reg!"b" = sra(reg!"b"); }),
@@ -389,7 +389,7 @@ class Processor
             0x2B: Instruction("SRA E", { reg!"e" = sra(reg!"e"); }),
             0x2C: Instruction("SRA H", { reg!"h" = sra(reg!"h"); }),
             0x2D: Instruction("SRA L", { reg!"l" = sra(reg!"l"); }),
-            0x2E: Instruction("SRA (HL)", { mem[reg!"hl"] = sra(mem[reg!"hl"]); }),
+            0x2E: Instruction("SRA (HL)", { reg!"(hl)" = sra(reg!"(hl)"); }),
             0x2F: Instruction("SRA A", { reg!"a" = sra(reg!"a"); }),
 
             0x30: Instruction("SWAP B", { reg!"b" = swap(reg!"b"); }),
@@ -398,7 +398,7 @@ class Processor
             0x33: Instruction("SWAP E", { reg!"e" = swap(reg!"e"); }),
             0x34: Instruction("SWAP H", { reg!"h" = swap(reg!"h"); }),
             0x35: Instruction("SWAP L", { reg!"l" = swap(reg!"l"); }),
-            0x36: Instruction("SWAP (HL)", { mem[reg!"hl"] = swap(mem[reg!"hl"]); }),
+            0x36: Instruction("SWAP (HL)", { reg!"(hl)" = swap(reg!"(hl)"); }),
             0x37: Instruction("SWAP A", { reg!"a" = swap(reg!"a"); }),
 
             0x38: Instruction("SRL B", { reg!"b" = srl(reg!"b"); }),
@@ -407,7 +407,7 @@ class Processor
             0x3B: Instruction("SRL E", { reg!"e" = srl(reg!"e"); }),
             0x3C: Instruction("SRL H", { reg!"h" = srl(reg!"h"); }),
             0x3D: Instruction("SRL L", { reg!"l" = srl(reg!"l"); }),
-            0x3E: Instruction("SRL (HL)", { mem[reg!"hl"] = srl(mem[reg!"hl"]); }),
+            0x3E: Instruction("SRL (HL)", { reg!"(hl)" = srl(reg!"(hl)"); }),
             0x3F: Instruction("SRL A", { reg!"a" = srl(reg!"a"); }),
         ];
         immutable tbitn = [&tbit!0, &tbit!1, &tbit!2, &tbit!3, &tbit!4, &tbit!5, &tbit!6, &tbit!7];
@@ -421,7 +421,7 @@ class Processor
             cbSet[op++] = Instruction(format("BIT %d,E", i), { tbitn[i](reg!"e"); });
             cbSet[op++] = Instruction(format("BIT %d,H", i), { tbitn[i](reg!"h"); });
             cbSet[op++] = Instruction(format("BIT %d,L", i), { tbitn[i](reg!"l"); });
-            cbSet[op++] = Instruction(format("BIT %d,(HL)", i), { tbitn[i](mem[reg!"hl"]); });
+            cbSet[op++] = Instruction(format("BIT %d,(HL)", i), { tbitn[i](reg!"(hl)"); });
             cbSet[op++] = Instruction(format("BIT %d,A", i), { tbitn[i](reg!"a"); });
         }
         assert(op == 0x80);
@@ -432,7 +432,7 @@ class Processor
             cbSet[op++] = Instruction(format("RES %d,E", i), { reg!"e" = resn[i](reg!"e"); });
             cbSet[op++] = Instruction(format("RES %d,H", i), { reg!"h" = resn[i](reg!"h"); });
             cbSet[op++] = Instruction(format("RES %d,L", i), { reg!"l" = resn[i](reg!"l"); });
-            cbSet[op++] = Instruction(format("RES %d,(HL)", i), { mem[reg!"hl"] = resn[i](mem[reg!"hl"]); });
+            cbSet[op++] = Instruction(format("RES %d,(HL)", i), { reg!"(hl)" = resn[i](reg!"(hl)"); });
             cbSet[op++] = Instruction(format("RES %d,A", i), { reg!"a" = resn[i](reg!"a"); });
         }
         assert(op == 0xC0);
@@ -443,7 +443,7 @@ class Processor
             cbSet[op++] = Instruction(format("SET %d,E", i), { reg!"e" = setn[i](reg!"e"); });
             cbSet[op++] = Instruction(format("SET %d,H", i), { reg!"h" = setn[i](reg!"h"); });
             cbSet[op++] = Instruction(format("SET %d,L", i), { reg!"l" = setn[i](reg!"l"); });
-            cbSet[op++] = Instruction(format("SET %d,(HL)", i), { mem[reg!"hl"] = setn[i](mem[reg!"hl"]); });
+            cbSet[op++] = Instruction(format("SET %d,(HL)", i), { reg!"(hl)" = setn[i](reg!"(hl)"); });
             cbSet[op++] = Instruction(format("SET %d,A", i), { reg!"a" = setn[i](reg!"a"); });
         }
         assert(op == 0x00);

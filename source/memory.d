@@ -26,7 +26,7 @@ class Memory(size_t bits)
         data = new ubyte[max];
     }
 
-    ubyte opIndex(size_t i) {
+    ubyte opIndex(size_t i) inout {
         return data[i];
     }
 
@@ -34,7 +34,7 @@ class Memory(size_t bits)
         data[i] = value;
     }
 
-    size_t opDollar() {
+    size_t opDollar() inout {
         return max;
     }
 
