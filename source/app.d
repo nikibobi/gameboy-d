@@ -10,6 +10,7 @@ import gameboy.utils;
 
 void main(string[] args)
 {
+    readROMs();
     auto cart = Cartage.fromFile("roms/Tetris.gb");
 
     enum PixelSize = 2;
@@ -38,6 +39,23 @@ void main(string[] args)
         //draw here
         window.draw(triangle, PrimitiveType.Quads);
         window.display();
+    }
+}
+
+void readROMs() {
+    import std.file;
+    foreach (string filename; dirEntries("roms", "*.gb", SpanMode.shallow)) {
+        writeln();
+        auto cart = Cartage.fromFile(filename);
+        writeln("Title: ", cart.title);
+        writeln("Color: ", cart.isColor ? "yes" : "no");
+        writeln("Super: ", cart.isSuper ? "yes" : "no");
+        writeln("Cartage: ", cart.type);
+        writefln("ROM size: %dKB %d banks", cart.romSize, cart.romBanks);
+        writefln("RAM size: %dKB", cart.ramSize);
+        writeln("Destination: ", cart.destination);
+        writeln("License: ", cart.license);
+        writeln("Version: ", cart.ver);
     }
 }
 

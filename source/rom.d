@@ -131,20 +131,3 @@ private:
     static immutable string[ubyte] cartages;
     static immutable string[ubyte] manuf;
 }
-
-unittest {
-    import std.file;
-    foreach (string filename; dirEntries("roms", "*.gb", SpanMode.shallow)) {
-        writeln();
-        auto cart = Cartage.fromFile(filename);
-        writeln("Title: ", cart.title);
-        // writeln("Color: ", cart.isColor ? "yes" : "no");
-        // writeln("Super: ", cart.isSuper ? "yes" : "no");
-        writeln("Cartage: ", cart.type);
-        // writefln("ROM size: %dKB %d banks", cart.romSize, cart.romBanks);
-        // writefln("RAM size: %dKB", cart.ramSize);
-        // writeln("Destination: ", cart.destination);
-        // writeln("License: ", cart.license);
-        // writeln("Version: ", cart.ver);
-    }
-}
