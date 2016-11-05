@@ -604,6 +604,24 @@ class Processor
         assert(cpu.reg!"pc" == 0x100);
     }
 
+    void step() {
+        ubyte opcode = mem[pc++];
+        final switch (opSet[opcode].args) {
+            case 0:
+                opSet[opcode].nullary();
+                break;
+            case 1:
+                ubyte arg = mem[pc++];
+                opSet[opcode].unary(arg);
+                break;
+            case 2:
+                ushort arg = cast(ushort)((mem[pc + 1] << 8) | mem[pc]);
+                pc += 2;
+                opSet[opcode].binary(arg);
+                break;
+        }
+    }
+
 private:
 
     ubyte carry8(int res) {
