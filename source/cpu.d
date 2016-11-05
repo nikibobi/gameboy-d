@@ -41,89 +41,14 @@ struct Instruction
     int args;
 }
 
-class CPU(size_t bits, string registers)
-if (bits.isPowerOf2)
+class Processor
 {
-    alias bitness!bits T;
-
-    this(Memory!(bits * 2) mem) {
-        this.mem = mem;
-    }
-
-    @property
-    auto reg(string select)() inout {
-        static if (select == "pc") {
-            return pc;
-        } else static if (select == "sp") {
-            return sp;
-        } else {
-            bitness!(select.length * bits) res = 0;
-            foreach (i, r; select) {
-                auto shift = (select.length - i - 1) * bits;
-                res |= cast(typeof(res))regs[r] << shift;
-            }
-            return res;
-        }
-    }
-
-    unittest {
-        auto mem = new Memory!16;
-        auto cpu = new CPU!(8, "abcdefhl")(mem);
-        assert(is(typeof(cpu.reg!"pc") == ushort));
-        assert(is(typeof(cpu.reg!"sp") == ushort));
-
-        assert(is(typeof(cpu.reg!"a") == ubyte));
-        assert(is(typeof(cpu.reg!"ab") == ushort));
-        assert(is(typeof(cpu.reg!"abc") == uint));
-        assert(is(typeof(cpu.reg!"abcd") == uint));
-        assert(is(typeof(cpu.reg!"abcde") == ulong));
-        assert(is(typeof(cpu.reg!"abcdef") == ulong));
-        assert(is(typeof(cpu.reg!"abcdefh") == ulong));
-        assert(is(typeof(cpu.reg!"abcdefhl") == ulong));
-    }
-
-    @property
-    void reg(string select)(bitness!(select.length * bits) value) {
-        static if (select == "pc") {
-            pc = value;
-        } else static if (select == "sp") {
-            sp = value;
-        } else {
-            foreach (i, r; select) {
-                auto shift = (select.length - i - 1) * bits;
-                regs[r] = T.max & (value >> shift);
-            }
-        }
-    }
-
-    unittest {
-        auto mem = new Memory!16;
-        auto cpu = new CPU!(8, "abcdefhl")(mem);
-        cpu.reg!"abcdefhl" = 0x0001020304050607;
-
-        assert(cpu.reg!"baef" == 0x01000405);
-        cpu.reg!"ab" = cpu.reg!"ba";
-        assert(cpu.reg!"ab" == 0x0100);
-        assert(cpu.reg!"aaa" == 0x010101);
-        cpu.reg!"af" = cpu.reg!"bc";
-        assert(cpu.reg!"a" == cpu.reg!"b" && cpu.reg!"f" == cpu.reg!"c");
-    }
-
-protected:
-    Instruction[ubyte] opSet;
-
-private:
-    T[char] regs;
-    bitness!(bits * 2) pc, sp;
-    Memory!(bits * 2) mem;
-}
-
-class GameboyCPU : CPU!(8, "abcdefhl")
-{
-    static immutable string flags = "chnz";
+    alias ubyte T;
+    enum bits = 8;
+    enum flags = "chnz";
 
     this(GameboyMemory mem) {
-        super(mem);
+        this.mem = mem;
         opSet = [
             0x00: Instruction("NOP", &nop),
             0x76: Instruction("HALT", &halt),
@@ -526,6 +451,83 @@ class GameboyCPU : CPU!(8, "abcdefhl")
     }
 
     @property
+    ushort reg(string select : "pc")() inout {
+        return pc;
+    }
+
+    @property
+    ushort reg(string select : "sp")() inout {
+        return sp;
+    }
+
+    @property
+    ubyte reg(string select : "(hl)")() inout {
+        return mem[reg!"hl"];
+    }
+
+    @property
+    auto reg(string select)() inout {
+        bitness!(select.length * bits) res = 0;
+        foreach (i, r; select) {
+            auto shift = (select.length - i - 1) * bits;
+            res |= cast(typeof(res))regs[r] << shift;
+        }
+        return res;
+    }
+
+    unittest {
+        auto mem = new GameboyMemory;
+        auto cpu = new Processor(mem);
+        assert(is(typeof(cpu.reg!"pc") == ushort));
+        assert(is(typeof(cpu.reg!"sp") == ushort));
+
+        assert(is(typeof(cpu.reg!"a") == ubyte));
+        assert(is(typeof(cpu.reg!"ab") == ushort));
+        assert(is(typeof(cpu.reg!"abc") == uint));
+        assert(is(typeof(cpu.reg!"abcd") == uint));
+        assert(is(typeof(cpu.reg!"abcde") == ulong));
+        assert(is(typeof(cpu.reg!"abcdef") == ulong));
+        assert(is(typeof(cpu.reg!"abcdefh") == ulong));
+        assert(is(typeof(cpu.reg!"abcdefhl") == ulong));
+    }
+
+    @property
+    void reg(string select : "pc")(ushort value) {
+        pc = value;
+    }
+
+    @property
+    void reg(string select : "sp")(ushort value) {
+        sp = value;
+    }
+
+    @property
+    void reg(string select : "(hl)")(ubyte value) {
+        mem[reg!"hl"] = value;
+    }
+
+    @property
+    void reg(string select)(bitness!(select.length * bits) value) {
+        foreach (i, r; select) {
+            auto shift = (select.length - i - 1) * bits;
+            regs[r] = T.max & (value >> shift);
+        }
+    }
+
+    unittest {
+        auto mem = new GameboyMemory;
+        auto cpu = new Processor(mem);
+        cpu.reg!"abcdefhl" = 0x0001020304050607;
+
+        assert(cpu.reg!"baef" == 0x01000405);
+        cpu.reg!"ab" = cpu.reg!"ba";
+        assert(cpu.reg!"ab" == 0x0100);
+        assert(cpu.reg!"aaa" == 0x010101);
+        cpu.reg!"af" = cpu.reg!"bc";
+        assert(cpu.reg!"a" == cpu.reg!"b" && cpu.reg!"f" == cpu.reg!"c");
+    }
+
+    @property
     T flag(char f)() inout
     if (flags.indexOf(f) != -1) {
         immutable i = flags.indexOf(f) + 4;
@@ -542,7 +544,7 @@ class GameboyCPU : CPU!(8, "abcdefhl")
     }
 
     unittest {
-        auto cpu = new GameboyCPU(new GameboyMemory);
+        auto cpu = new Processor(new GameboyMemory);
                       //znhc ____
         cpu.reg!"f" = 0b0010_0000;
         assert(cpu.flag!'h' == 1);
@@ -595,7 +597,7 @@ class GameboyCPU : CPU!(8, "abcdefhl")
 
     unittest {
         auto mem = new GameboyMemory;
-        auto cpu = new GameboyCPU(mem);
+        auto cpu = new Processor(mem);
         cpu.boot();
         assert(cpu.reg!"abcdefhl" == 0x01001300D8B0014D);
         assert(cpu.reg!"sp" == 0xFFFE);
@@ -972,5 +974,9 @@ protected:
     }
 
 private:
+    T[char] regs;
+    ushort pc, sp;
+    GameboyMemory mem;
+    Instruction[ubyte] opSet;
     Instruction[ubyte] cbSet;
 }
