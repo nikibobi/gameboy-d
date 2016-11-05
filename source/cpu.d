@@ -625,19 +625,19 @@ class GameboyCPU : CPU!(8, "abcdefhl")
 private:
 
     ubyte cary8(int res) {
-        return (res & 0xff00) != 0 ? 1 : 0;
+        return (res & 0xFF00) != 0 ? 1 : 0;
     }
 
     ubyte cary16(int res) {
-        return (res & 0xffff0000) != 0 ? 1 : 0;
+        return (res & 0xFFFF0000) != 0 ? 1 : 0;
     }
 
     ubyte halfcary(int a, int b) {
-        return (a & 0x0f) + (b & 0x0f) > 0x0f ? 1 : 0;
+        return (a & 0x0F) + (b & 0x0F) > 0x0F ? 1 : 0;
     }
 
     ubyte halfcary2(int a, int b) {
-        return (a & 0x0f) > (b & 0x0f) ? 1 : 0;
+        return (a & 0x0F) > (b & 0x0F) ? 1 : 0;
     }
 
     ubyte zero(int res) {
@@ -662,7 +662,7 @@ protected:
         flag!'h' = halfcary(sp, value);
         flag!'z' = 0;
         flag!'n' = 0;
-        reg!"hl" = cast(ushort)(res & 0xffff);
+        reg!"hl" = cast(ushort)(res & 0xFFFF);
     }
 
     void ldsp(ushort value) {
@@ -685,7 +685,7 @@ protected:
     void add(ubyte value) {
         uint res = reg!"a" + value;
         flag!'c' = cary8(res);
-        reg!"a" = cast(T)(res & 0xff);
+        reg!"a" = cast(T)(res & 0xFF);
         flag!'z' = zero(reg!"a");
         flag!'h' = halfcary(reg!"a", value);
         flag!'n' = 0;
@@ -698,7 +698,7 @@ protected:
         flag!'z' = value == reg!"a" ? 1 : 0;
         flag!'h' = halfcary(reg!"a", value);
         flag!'n' = 0;
-        reg!"a" = cast(T)(res & 0xff);
+        reg!"a" = cast(T)(res & 0xFF);
     }
 
     void sub(ubyte value) {
@@ -759,7 +759,7 @@ protected:
     }
 
     ubyte dec(ubyte value) {
-        flag!'h' = (value & 0x0f) != 0 ? 1 : 0;
+        flag!'h' = (value & 0x0F) != 0 ? 1 : 0;
         value--;
         flag!'z' = zero(value);
         flag!'n' = 1;
@@ -776,7 +776,7 @@ protected:
     }
 
     ubyte inc(ubyte value) {
-        flag!'h' = (value & 0x0f) == 0x0f ? 1 : 0;
+        flag!'h' = (value & 0x0F) == 0x0F ? 1 : 0;
         value++;
         flag!'z' = zero(value);
         flag!'n' = 0;
@@ -786,7 +786,7 @@ protected:
     void addhl(ushort value) {
         uint res = reg!"hl" + value;
         flag!'c' = cary16(res);
-        reg!"hl" = cast(ushort)(res & 0xffff);
+        reg!"hl" = cast(ushort)(res & 0xFFFF);
         flag!'h' = halfcary(reg!"hl", value);
         flag!'n' = 0;
     }
@@ -794,7 +794,7 @@ protected:
     void addsp(ubyte value) {
         int res = reg!"sp" + cast(byte)value;
         flag!'c' = cary16(res);
-        reg!"sp" = cast(ushort)(res & 0xffff);
+        reg!"sp" = cast(ushort)(res & 0xFFFF);
         flag!'h' = halfcary(reg!"sp", cast(byte)value);
         flag!'z' = 0;
         flag!'n' = 0;
