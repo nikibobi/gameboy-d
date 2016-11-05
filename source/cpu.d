@@ -624,19 +624,19 @@ class GameboyCPU : CPU!(8, "abcdefhl")
 
 private:
 
-    ubyte cary8(int res) {
+    ubyte carry8(int res) {
         return (res & 0xFF00) != 0 ? 1 : 0;
     }
 
-    ubyte cary16(int res) {
+    ubyte carry16(int res) {
         return (res & 0xFFFF0000) != 0 ? 1 : 0;
     }
 
-    ubyte halfcary(int a, int b) {
+    ubyte halfcarry(int a, int b) {
         return (a & 0x0F) + (b & 0x0F) > 0x0F ? 1 : 0;
     }
 
-    ubyte halfcary2(int a, int b) {
+    ubyte halfcarry2(int a, int b) {
         return (a & 0x0F) > (b & 0x0F) ? 1 : 0;
     }
 
@@ -658,8 +658,8 @@ protected:
 
     void ldhl(ubyte value) {
         int res = sp + cast(byte)value;
-        flag!'c' = cary16(res);
-        flag!'h' = halfcary(sp, value);
+        flag!'c' = carry16(res);
+        flag!'h' = halfcarry(sp, value);
         flag!'z' = 0;
         flag!'n' = 0;
         reg!"hl" = cast(ushort)(res & 0xFFFF);
@@ -684,19 +684,19 @@ protected:
 
     void add(ubyte value) {
         uint res = reg!"a" + value;
-        flag!'c' = cary8(res);
+        flag!'c' = carry8(res);
         reg!"a" = cast(T)(res & 0xFF);
         flag!'z' = zero(reg!"a");
-        flag!'h' = halfcary(reg!"a", value);
+        flag!'h' = halfcarry(reg!"a", value);
         flag!'n' = 0;
     }
 
     void adc(ubyte value) {
         value += flag!'c';
         int res = reg!"a" + value;
-        flag!'c' = cary8(res);
+        flag!'c' = carry8(res);
         flag!'z' = value == reg!"a" ? 1 : 0;
-        flag!'h' = halfcary(reg!"a", value);
+        flag!'h' = halfcarry(reg!"a", value);
         flag!'n' = 0;
         reg!"a" = cast(T)(res & 0xFF);
     }
@@ -704,7 +704,7 @@ protected:
     void sub(ubyte value) {
         flag!'n' = 1;
         flag!'c' = value > reg!"a" ? 1 : 0;
-        flag!'h' = halfcary2(value, reg!"a");
+        flag!'h' = halfcarry2(value, reg!"a");
         reg!"a" = cast(T)(reg!"a" - value);
         flag!'z' = zero(reg!"a");
     }
@@ -714,7 +714,7 @@ protected:
         flag!'n' = 1;
         flag!'c' = value > reg!"a" ? 1 : 0;
         flag!'z' = value == reg!"a" ? 1 : 0;
-        flag!'h' = halfcary2(value, reg!"a");
+        flag!'h' = halfcarry2(value, reg!"a");
         reg!"a" = cast(T)(reg!"a" - value);
     }
 
@@ -745,7 +745,7 @@ protected:
     void cp(ubyte value) {
         flag!'z' = reg!"a" == value ? 1 : 0;
         flag!'c' = value > reg!"a" ? 1 : 0;
-        flag!'h' = halfcary2(value, reg!"a");
+        flag!'h' = halfcarry2(value, reg!"a");
         flag!'n' = 1;
     }
 
@@ -785,17 +785,17 @@ protected:
 
     void addhl(ushort value) {
         uint res = reg!"hl" + value;
-        flag!'c' = cary16(res);
+        flag!'c' = carry16(res);
         reg!"hl" = cast(ushort)(res & 0xFFFF);
-        flag!'h' = halfcary(reg!"hl", value);
+        flag!'h' = halfcarry(reg!"hl", value);
         flag!'n' = 0;
     }
 
     void addsp(ubyte value) {
         int res = reg!"sp" + cast(byte)value;
-        flag!'c' = cary16(res);
+        flag!'c' = carry16(res);
         reg!"sp" = cast(ushort)(res & 0xFFFF);
-        flag!'h' = halfcary(reg!"sp", cast(byte)value);
+        flag!'h' = halfcarry(reg!"sp", cast(byte)value);
         flag!'z' = 0;
         flag!'n' = 0;
     }
@@ -823,30 +823,30 @@ protected:
     }
 
     void rlca() {
-        ubyte cary = (reg!"a" & 0x80) >> 7;
-        flag!'c' = cary;
+        ubyte carry = (reg!"a" & 0x80) >> 7;
+        flag!'c' = carry;
         reg!"a" = cast(T)(reg!"a" << 1);
-        reg!"a" = cast(T)(reg!"a" + cary);
+        reg!"a" = cast(T)(reg!"a" + carry);
         flag!'n' = 0;
         flag!'z' = 0;
         flag!'h' = 0;
     }
 
     void rla() {
-        ubyte cary = flag!'c';
+        ubyte carry = flag!'c';
         flag!'c' = (reg!"a" & 0x80) != 0 ? 1 : 0;
         reg!"a" = cast(T)(reg!"a" << 1);
-        reg!"a" = cast(T)(reg!"a" + cary);
+        reg!"a" = cast(T)(reg!"a" + carry);
         flag!'n' = 0;
         flag!'z' = 0;
         flag!'h' = 0;
     }
 
     void rrca() {
-        ubyte cary = reg!"a" & 0x01;
-        flag!'c' = cary;
+        ubyte carry = reg!"a" & 0x01;
+        flag!'c' = carry;
         reg!"a" = cast(T)(reg!"a" >> 1);
-        if (cary) {
+        if (carry) {
             reg!"a" = cast(T)(reg!"a" | 0x80);
         }
         flag!'n' = 0;
@@ -855,10 +855,10 @@ protected:
     }
 
     void rra() {
-        int cary = flag!'c' << 7;
+        int carry = flag!'c' << 7;
         flag!'c' = (reg!"a" & 0x01);
         reg!"a" = cast(T)(reg!"a" >> 1);
-        reg!"a" = cast(T)(reg!"a" + cary);
+        reg!"a" = cast(T)(reg!"a" + carry);
         flag!'n' = 0;
         flag!'z' = 0;
         flag!'h' = 0;
@@ -897,10 +897,10 @@ protected:
     }
 
     ubyte rlc(ubyte value) {
-        int cary = (value & 0x80) >> 7;
+        int carry = (value & 0x80) >> 7;
         flag!'c' = (value & 0x80) != 0 ? 1 : 0;
         value <<= 1;
-        value += cary;
+        value += carry;
         flag!'z' = zero(value);
         flag!'n' = 0;
         flag!'h' = 0;
@@ -908,10 +908,10 @@ protected:
     }
 
     ubyte rl(ubyte value) {
-        int cary = flag!'c';
+        int carry = flag!'c';
         flag!'c' = (value & 0x80) != 0 ? 1 : 0;
         value <<= 1;
-        value += cary;
+        value += carry;
         flag!'z' = zero(value);
         flag!'n' = 0;
         flag!'h' = 0;
@@ -919,10 +919,10 @@ protected:
     }
 
     ubyte rrc(ubyte value) {
-        int cary = value & 0x01;
+        int carry = value & 0x01;
         value >>= 1;
-        value |= cary ? 0x80 : 0;
-        flag!'c' = cary ? 1 : 0;
+        value |= carry ? 0x80 : 0;
+        flag!'c' = carry ? 1 : 0;
         flag!'z' = zero(value);
         flag!'n' = 0;
         flag!'h' = 0;
