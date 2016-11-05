@@ -54,19 +54,19 @@ class Processor
             0x76: Instruction("HALT", &halt),
             0x10: Instruction("STOP 0", &stop),
 
-            0x01: Instruction("LD BC,d16", (ushort n) { reg!"bc" = n; }),
-            0x11: Instruction("LD DE,d16", (ushort n) { reg!"de" = n; }),
-            0x21: Instruction("LD HL,d16", (ushort n) { reg!"hl" = n; }),
-            0x31: Instruction("LD SP,d16", (ushort n) { reg!"sp" = n; }),
+            0x01: Instruction("LD BC,$%04X", (ushort n) { reg!"bc" = n; }),
+            0x11: Instruction("LD DE,$%04X", (ushort n) { reg!"de" = n; }),
+            0x21: Instruction("LD HL,$%04X", (ushort n) { reg!"hl" = n; }),
+            0x31: Instruction("LD SP,$%04X", (ushort n) { reg!"sp" = n; }),
 
-            0x06: Instruction("LD B,d8", (ubyte n) { reg!"b" = n; }),
-            0x0E: Instruction("LD C,d8", (ubyte n) { reg!"c" = n; }),
-            0x16: Instruction("LD D,d8", (ubyte n) { reg!"d" = n; }),
-            0x1E: Instruction("LD E,d8", (ubyte n) { reg!"e" = n; }),
-            0x26: Instruction("LD H,d8", (ubyte n) { reg!"h" = n; }),
-            0x2E: Instruction("LD L,d8", (ubyte n) { reg!"l" = n; }),
-            0x36: Instruction("LD (HL),d8", (ubyte n) { reg!"(hl)" = n; }),
-            0x3E: Instruction("LD A,d8", (ubyte n) { reg!"a" = n; }),
+            0x06: Instruction("LD B,$%02X", (ubyte n) { reg!"b" = n; }),
+            0x0E: Instruction("LD C,$%02X", (ubyte n) { reg!"c" = n; }),
+            0x16: Instruction("LD D,$%02X", (ubyte n) { reg!"d" = n; }),
+            0x1E: Instruction("LD E,$%02X", (ubyte n) { reg!"e" = n; }),
+            0x26: Instruction("LD H,$%02X", (ubyte n) { reg!"h" = n; }),
+            0x2E: Instruction("LD L,$%02X", (ubyte n) { reg!"l" = n; }),
+            0x36: Instruction("LD (HL),$%02X", (ubyte n) { reg!"(hl)" = n; }),
+            0x3E: Instruction("LD A,$%02X", (ubyte n) { reg!"a" = n; }),
 
             0x40: Instruction("LD B,B", { reg!"b" = reg!"b"; }),
             0x41: Instruction("LD B,C", { reg!"b" = reg!"c"; }),
@@ -141,10 +141,10 @@ class Processor
 
             0x0A: Instruction("LD A,(BC)", { reg!"a" = mem[reg!"bc"]; }),
             0x1A: Instruction("LD A,(DE)", { reg!"a" = mem[reg!"de"]; }),
-            0xFA: Instruction("LD A,(a16)", (ushort n) { reg!"a" = mem[n]; }),
+            0xFA: Instruction("LD A,($%04X)", (ushort n) { reg!"a" = mem[n]; }),
             0x02: Instruction("LD (BC),A", { mem[reg!"bc"] = reg!"a"; }),
             0x12: Instruction("LD (DE),A", { mem[reg!"de"] = reg!"a"; }),
-            0xEA: Instruction("LD (a16),A", (ushort n) { mem[n] = reg!"a"; }),
+            0xEA: Instruction("LD ($%04X),A", (ushort n) { mem[n] = reg!"a"; }),
 
             0xF2: Instruction("LD A,(C)", { reg!"a" = mem[0xFF00 + reg!"c"]; }),
             0xE2: Instruction("LD (C),A", { mem[0xFF00 + reg!"c"] = reg!"a"; }),
@@ -154,12 +154,12 @@ class Processor
             0x2A: Instruction("LD A,(HL+)", { reg!"a" = reg!"(hl)"; inc!"hl"; }),
             0x3A: Instruction("LD A,(HL-)", { reg!"a" = reg!"(hl)"; dec!"hl"; }),
 
-            0xE0: Instruction("LDH (a8),A", (ubyte n) { mem[0xFF00 + n] = reg!"a"; }),
-            0xF0: Instruction("LDH A,(a8)", (ubyte n) { reg!"a" = mem[0xFF00 + n]; }),
+            0xE0: Instruction("LDH ($%02X),A", (ubyte n) { mem[0xFF00 + n] = reg!"a"; }),
+            0xF0: Instruction("LDH A,($%02X)", (ubyte n) { reg!"a" = mem[0xFF00 + n]; }),
 
             0xF9: Instruction("LD SP,HL", { reg!"sp" = reg!"hl"; }),
-            0xF8: Instruction("LD HL,SP+r8", &ldhl),
-            0x08: Instruction("LD (a16),SP", &ldsp),
+            0xF8: Instruction("LD HL,SP+$%02X", &ldhl),
+            0x08: Instruction("LD ($%04X),SP", &ldsp),
 
             0xC5: Instruction("PUSH BC", { push(reg!"bc"); }),
             0xD5: Instruction("PUSH DE", { push(reg!"de"); }),
@@ -174,7 +174,7 @@ class Processor
             0x85: Instruction("ADD A,L", { add(reg!"l"); }),
             0x86: Instruction("ADD A,(HL)", { add(reg!"(hl)"); }),
             0x87: Instruction("ADD A,A", { add(reg!"a"); }),
-            0xC6: Instruction("ADD A,d8", &add),
+            0xC6: Instruction("ADD A,$%02X", &add),
 
             0x88: Instruction("ADC A,B", { adc(reg!"b"); }),
             0x89: Instruction("ADC A,C", { adc(reg!"c"); }),
@@ -184,7 +184,7 @@ class Processor
             0x8D: Instruction("ADC A,L", { adc(reg!"l"); }),
             0x8E: Instruction("ADC A,(HL)", { adc(reg!"(hl)"); }),
             0x8F: Instruction("ADC A,A", { adc(reg!"a"); }),
-            0xCE: Instruction("ADC A,d8", &adc),
+            0xCE: Instruction("ADC A,$%02X", &adc),
 
             0x90: Instruction("SUB B", { sub(reg!"b"); }),
             0x91: Instruction("SUB C", { sub(reg!"c"); }),
@@ -194,7 +194,7 @@ class Processor
             0x95: Instruction("SUB L", { sub(reg!"l"); }),
             0x96: Instruction("SUB (HL)", { sub(reg!"(hl)"); }),
             0x97: Instruction("SUB A", { sub(reg!"a"); }),
-            0xD6: Instruction("SUB d8", &sub),
+            0xD6: Instruction("SUB $%02X", &sub),
 
             0x98: Instruction("SBC A,B", { sbc(reg!"b"); }),
             0x99: Instruction("SBC A,C", { sbc(reg!"c"); }),
@@ -204,7 +204,7 @@ class Processor
             0x9D: Instruction("SBC A,L", { sbc(reg!"l"); }),
             0x9E: Instruction("SBC A,(HL)", { sbc(reg!"(hl)"); }),
             0x9F: Instruction("SBC A,A", { sbc(reg!"a"); }),
-            0xDE: Instruction("SBC A,d8", &sbc),
+            0xDE: Instruction("SBC A,$%02X", &sbc),
 
             0xA0: Instruction("AND B", { and(reg!"b"); }),
             0xA1: Instruction("AND C", { and(reg!"c"); }),
@@ -214,7 +214,7 @@ class Processor
             0xA5: Instruction("AND L", { and(reg!"l"); }),
             0xA6: Instruction("AND (HL)", { and(reg!"(hl)"); }),
             0xA7: Instruction("AND A", { and(reg!"a"); }),
-            0xE6: Instruction("AND d8", &and),
+            0xE6: Instruction("AND $%02X", &and),
 
             0xB0: Instruction("OR B", { or(reg!"b"); }),
             0xB1: Instruction("OR C", { or(reg!"c"); }),
@@ -224,7 +224,7 @@ class Processor
             0xB5: Instruction("OR L", { or(reg!"l"); }),
             0xB6: Instruction("OR (HL)", { or(reg!"(hl)"); }),
             0xB7: Instruction("OR A", { or(reg!"a"); }),
-            0xF6: Instruction("OR d8", &or),
+            0xF6: Instruction("OR $%02X", &or),
 
             0xA8: Instruction("XOR B", { xor(reg!"b"); }),
             0xA9: Instruction("XOR C", { xor(reg!"c"); }),
@@ -234,7 +234,7 @@ class Processor
             0xAD: Instruction("XOR L", { xor(reg!"l"); }),
             0xAE: Instruction("XOR (HL)", { xor(reg!"(hl)"); }),
             0xAF: Instruction("XOR A", { xor(reg!"a"); }),
-            0xEE: Instruction("XOR d8", &xor),
+            0xEE: Instruction("XOR $%02X", &xor),
 
             0xB8: Instruction("CP B", { cp(reg!"b"); }),
             0xB9: Instruction("CP C", { cp(reg!"c"); }),
@@ -244,7 +244,7 @@ class Processor
             0xBD: Instruction("CP L", { cp(reg!"l"); }),
             0xBE: Instruction("CP (HL)", { cp(reg!"(hl)"); }),
             0xBF: Instruction("CP A", { cp(reg!"a"); }),
-            0xFE: Instruction("CP d8", &cp),
+            0xFE: Instruction("CP $%02X", &cp),
 
             0x04: Instruction("INC B", &inc!"b"),
             0x0C: Instruction("INC C", &inc!"c"),
@@ -274,7 +274,7 @@ class Processor
             0x29: Instruction("ADD HL,HL", { addhl(reg!"hl"); }),
             0x39: Instruction("ADD HL,SP", { addhl(reg!"sp"); }),
 
-            0xE8: Instruction("ADD SP,r8", &addsp),
+            0xE8: Instruction("ADD SP,$%02X", &addsp),
 
             0x03: Instruction("INC BC", &inc!"bc"),
             0x13: Instruction("INC DE", &inc!"de"),
@@ -299,24 +299,24 @@ class Processor
             0x0F: Instruction("RRCA", &rrca),
             0x1F: Instruction("RRA", &rra),
 
-            0xC3: Instruction("JP a16", &jp),
-            0xC2: Instruction("JP NZ,a16", (ushort n) { if (flag!'z' == 0) jp(n); }),
-            0xCA: Instruction("JP Z,a16", (ushort n) { if (flag!'z' != 0) jp(n); }),
-            0xD2: Instruction("JP NC,a16", (ushort n) { if (flag!'c' == 0) jp(n); }),
-            0xDA: Instruction("JP C,a16", (ushort n) { if (flag!'c' != 0) jp(n); }),
+            0xC3: Instruction("JP $%04X", &jp),
+            0xC2: Instruction("JP NZ,$%04X", (ushort n) { if (flag!'z' == 0) jp(n); }),
+            0xCA: Instruction("JP Z,$%04X", (ushort n) { if (flag!'z' != 0) jp(n); }),
+            0xD2: Instruction("JP NC,$%04X", (ushort n) { if (flag!'c' == 0) jp(n); }),
+            0xDA: Instruction("JP C,$%04X", (ushort n) { if (flag!'c' != 0) jp(n); }),
             0xE9: Instruction("JP (HL)", { jp(reg!"hl"); }),
 
-            0x18: Instruction("JR r8", &jr),
-            0x20: Instruction("JR NZ,r8", (ubyte n) { if (flag!'z' == 0) jr(n); }),
-            0x28: Instruction("JR Z,r8", (ubyte n) { if (flag!'z' != 0) jr(n); }),
-            0x30: Instruction("JR NC,r8", (ubyte n) { if (flag!'c' == 0) jr(n); }),
-            0x38: Instruction("JR C,r8", (ubyte n) { if (flag!'c' != 0) jr(n); }),
+            0x18: Instruction("JR $%02X", &jr),
+            0x20: Instruction("JR NZ,$%02X", (ubyte n) { if (flag!'z' == 0) jr(n); }),
+            0x28: Instruction("JR Z,$%02X", (ubyte n) { if (flag!'z' != 0) jr(n); }),
+            0x30: Instruction("JR NC,$%02X", (ubyte n) { if (flag!'c' == 0) jr(n); }),
+            0x38: Instruction("JR C,$%02X", (ubyte n) { if (flag!'c' != 0) jr(n); }),
 
-            0xCD: Instruction("CALL a16", &call),
-            0xC4: Instruction("CALL NZ,a16", (ushort n) { if (flag!'z' == 0) call(n); }),
-            0xCC: Instruction("CALL Z,a16", (ushort n) { if (flag!'z' != 0) call(n); }),
-            0xD4: Instruction("CALL NC,a16", (ushort n) { if (flag!'c' == 0) call(n); }),
-            0xDC: Instruction("CALL C,a16", (ushort n) { if (flag!'c' != 0) call(n); }),
+            0xCD: Instruction("CALL $%04X", &call),
+            0xC4: Instruction("CALL NZ,$%04X", (ushort n) { if (flag!'z' == 0) call(n); }),
+            0xCC: Instruction("CALL Z,$%04X", (ushort n) { if (flag!'z' != 0) call(n); }),
+            0xD4: Instruction("CALL NC,$%04X", (ushort n) { if (flag!'c' == 0) call(n); }),
+            0xDC: Instruction("CALL C,$%04X", (ushort n) { if (flag!'c' != 0) call(n); }),
 
             0xC7: Instruction("RST 00H", &rst!0x00),
             0xCF: Instruction("RST 08H", &rst!0x08),
@@ -608,15 +608,18 @@ class Processor
         ubyte opcode = mem[pc++];
         final switch (opSet[opcode].args) {
             case 0:
+                writeln(opSet[opcode].mnemonic);
                 opSet[opcode].nullary();
                 break;
             case 1:
                 ubyte arg = mem[pc++];
+                writefln(opSet[opcode].mnemonic, arg);
                 opSet[opcode].unary(arg);
                 break;
             case 2:
                 ushort arg = cast(ushort)((mem[pc + 1] << 8) | mem[pc]);
                 pc += 2;
+                writefln(opSet[opcode].mnemonic, arg);
                 opSet[opcode].binary(arg);
                 break;
         }
