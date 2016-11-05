@@ -110,7 +110,7 @@ if (bits.isPowerOf2)
     }
 
 protected:
-    Instruction[ubyte] set;
+    Instruction[ubyte] opSet;
 
 private:
     T[char] regs;
@@ -124,7 +124,7 @@ class GameboyCPU : CPU!(8, "abcdefhl")
 
     this(GameboyMemory mem) {
         super(mem);
-        set = [
+        opSet = [
             0x00: Instruction("NOP", &nop),
             0x76: Instruction("HALT", &halt),
             0x10: Instruction("STOP 0", &stop),
@@ -411,19 +411,117 @@ class GameboyCPU : CPU!(8, "abcdefhl")
 
             0xCB: Instruction("PREFIX CB", &cb)
         ];
-        set.rehash();
-        //TODO: finish this one way or another
-        auto refs = [`reg!"b"`, `reg!"c"`, `reg!"d"`, `reg!"e"`, `reg!"h"`, `reg!"l"`, `mem[reg!"hl"]`, `reg!"a"`];
-        auto vals = ["B", "C", "D", "E", "H", "L", "(HL)", "A"];
-        auto opcs = ["RLC", "RRC", "RL", "RR", "SLA", "SRA", "SWAP", "SRL"];
-        for (size_t i = 0x00; i <= 0x30; i += 0x10) {
-            for (size_t r = 0x00; r <= 0x0F; r += 0x01) {
-                auto opcode = cast(ubyte)(i + r);
-                auto mnemonic = format("%s %s", opcs[opcode / 8], vals[opcode % 8]);
-                writefln("0x%02X: %s", opcode, mnemonic);
-                cbSet[opcode] = Instruction(mnemonic, &nop);
-            }
+        opSet.rehash();
+        cbSet = [
+            0x00: Instruction("RLC B", { reg!"b" = rlc(reg!"b"); }),
+            0x01: Instruction("RLC C", { reg!"c" = rlc(reg!"c"); }),
+            0x02: Instruction("RLC D", { reg!"d" = rlc(reg!"d"); }),
+            0x03: Instruction("RLC E", { reg!"e" = rlc(reg!"e"); }),
+            0x04: Instruction("RLC H", { reg!"h" = rlc(reg!"h"); }),
+            0x05: Instruction("RLC L", { reg!"l" = rlc(reg!"l"); }),
+            0x06: Instruction("RLC (HL)", { mem[reg!"hl"] = rlc(mem[reg!"hl"]); }),
+            0x07: Instruction("RLC A", { reg!"a" = rlc(reg!"a"); }),
+
+            0x08: Instruction("RRC B", { reg!"b" = rrc(reg!"b"); }),
+            0x09: Instruction("RRC C", { reg!"c" = rrc(reg!"c"); }),
+            0x0A: Instruction("RRC D", { reg!"d" = rrc(reg!"d"); }),
+            0x0B: Instruction("RRC E", { reg!"e" = rrc(reg!"e"); }),
+            0x0C: Instruction("RRC H", { reg!"h" = rrc(reg!"h"); }),
+            0x0D: Instruction("RRC L", { reg!"l" = rrc(reg!"l"); }),
+            0x0E: Instruction("RRC (HL)", { mem[reg!"hl"] = rrc(mem[reg!"hl"]); }),
+            0x0F: Instruction("RRC A", { reg!"a" = rrc(reg!"a"); }),
+
+            0x10: Instruction("RL B", { reg!"b" = rl(reg!"b"); }),
+            0x11: Instruction("RL C", { reg!"c" = rl(reg!"c"); }),
+            0x12: Instruction("RL D", { reg!"d" = rl(reg!"d"); }),
+            0x13: Instruction("RL E", { reg!"e" = rl(reg!"e"); }),
+            0x14: Instruction("RL H", { reg!"h" = rl(reg!"h"); }),
+            0x15: Instruction("RL L", { reg!"l" = rl(reg!"l"); }),
+            0x16: Instruction("RL (HL)", { mem[reg!"hl"] = rl(mem[reg!"hl"]); }),
+            0x17: Instruction("RL A", { reg!"a" = rl(reg!"a"); }),
+
+            0x18: Instruction("RR B", { reg!"b" = rr(reg!"b"); }),
+            0x19: Instruction("RR C", { reg!"c" = rr(reg!"c"); }),
+            0x1A: Instruction("RR D", { reg!"d" = rr(reg!"d"); }),
+            0x1B: Instruction("RR E", { reg!"e" = rr(reg!"e"); }),
+            0x1C: Instruction("RR H", { reg!"h" = rr(reg!"h"); }),
+            0x1D: Instruction("RR L", { reg!"l" = rr(reg!"l"); }),
+            0x1E: Instruction("RR (HL)", { mem[reg!"hl"] = rr(mem[reg!"hl"]); }),
+            0x1F: Instruction("RR A", { reg!"a" = rr(reg!"a"); }),
+
+            0x20: Instruction("SLA B", { reg!"b" = sla(reg!"b"); }),
+            0x21: Instruction("SLA C", { reg!"c" = sla(reg!"c"); }),
+            0x22: Instruction("SLA D", { reg!"d" = sla(reg!"d"); }),
+            0x23: Instruction("SLA E", { reg!"e" = sla(reg!"e"); }),
+            0x24: Instruction("SLA H", { reg!"h" = sla(reg!"h"); }),
+            0x25: Instruction("SLA L", { reg!"l" = sla(reg!"l"); }),
+            0x26: Instruction("SLA (HL)", { mem[reg!"hl"] = sla(mem[reg!"hl"]); }),
+            0x27: Instruction("SLA A", { reg!"a" = sla(reg!"a"); }),
+
+            0x28: Instruction("SRA B", { reg!"b" = sra(reg!"b"); }),
+            0x29: Instruction("SRA C", { reg!"c" = sra(reg!"c"); }),
+            0x2A: Instruction("SRA D", { reg!"d" = sra(reg!"d"); }),
+            0x2B: Instruction("SRA E", { reg!"e" = sra(reg!"e"); }),
+            0x2C: Instruction("SRA H", { reg!"h" = sra(reg!"h"); }),
+            0x2D: Instruction("SRA L", { reg!"l" = sra(reg!"l"); }),
+            0x2E: Instruction("SRA (HL)", { mem[reg!"hl"] = sra(mem[reg!"hl"]); }),
+            0x2F: Instruction("SRA A", { reg!"a" = sra(reg!"a"); }),
+
+            0x30: Instruction("SWAP B", { reg!"b" = swap(reg!"b"); }),
+            0x31: Instruction("SWAP C", { reg!"c" = swap(reg!"c"); }),
+            0x32: Instruction("SWAP D", { reg!"d" = swap(reg!"d"); }),
+            0x33: Instruction("SWAP E", { reg!"e" = swap(reg!"e"); }),
+            0x34: Instruction("SWAP H", { reg!"h" = swap(reg!"h"); }),
+            0x35: Instruction("SWAP L", { reg!"l" = swap(reg!"l"); }),
+            0x36: Instruction("SWAP (HL)", { mem[reg!"hl"] = swap(mem[reg!"hl"]); }),
+            0x37: Instruction("SWAP A", { reg!"a" = swap(reg!"a"); }),
+
+            0x38: Instruction("SRL B", { reg!"b" = srl(reg!"b"); }),
+            0x39: Instruction("SRL C", { reg!"c" = srl(reg!"c"); }),
+            0x3A: Instruction("SRL D", { reg!"d" = srl(reg!"d"); }),
+            0x3B: Instruction("SRL E", { reg!"e" = srl(reg!"e"); }),
+            0x3C: Instruction("SRL H", { reg!"h" = srl(reg!"h"); }),
+            0x3D: Instruction("SRL L", { reg!"l" = srl(reg!"l"); }),
+            0x3E: Instruction("SRL (HL)", { mem[reg!"hl"] = srl(mem[reg!"hl"]); }),
+            0x3F: Instruction("SRL A", { reg!"a" = srl(reg!"a"); }),
+        ];
+        immutable tbitn = [&tbit!0, &tbit!1, &tbit!2, &tbit!3, &tbit!4, &tbit!5, &tbit!6, &tbit!7];
+        immutable resn = [&res!0, &res!1, &res!2, &res!3, &res!4, &res!5, &res!6, &res!7];
+        immutable setn = [&set!0, &set!1, &set!2, &set!3, &set!4, &set!5, &set!6, &set!7];
+        ubyte op = 0x40;
+        for (size_t i = 0; i < 8; i++) {
+            cbSet[op++] = Instruction(format("BIT %d,B", i), { tbitn[i](reg!"b"); });
+            cbSet[op++] = Instruction(format("BIT %d,C", i), { tbitn[i](reg!"c"); });
+            cbSet[op++] = Instruction(format("BIT %d,D", i), { tbitn[i](reg!"d"); });
+            cbSet[op++] = Instruction(format("BIT %d,E", i), { tbitn[i](reg!"e"); });
+            cbSet[op++] = Instruction(format("BIT %d,H", i), { tbitn[i](reg!"h"); });
+            cbSet[op++] = Instruction(format("BIT %d,L", i), { tbitn[i](reg!"l"); });
+            cbSet[op++] = Instruction(format("BIT %d,(HL)", i), { tbitn[i](mem[reg!"hl"]); });
+            cbSet[op++] = Instruction(format("BIT %d,A", i), { tbitn[i](reg!"a"); });
         }
+        assert(op == 0x80);
+        for (size_t i = 0; i < 8; i++) {
+            cbSet[op++] = Instruction(format("RES %d,B", i), { reg!"b" = resn[i](reg!"b"); });
+            cbSet[op++] = Instruction(format("RES %d,C", i), { reg!"c" = resn[i](reg!"c"); });
+            cbSet[op++] = Instruction(format("RES %d,D", i), { reg!"d" = resn[i](reg!"d"); });
+            cbSet[op++] = Instruction(format("RES %d,E", i), { reg!"e" = resn[i](reg!"e"); });
+            cbSet[op++] = Instruction(format("RES %d,H", i), { reg!"h" = resn[i](reg!"h"); });
+            cbSet[op++] = Instruction(format("RES %d,L", i), { reg!"l" = resn[i](reg!"l"); });
+            cbSet[op++] = Instruction(format("RES %d,(HL)", i), { mem[reg!"hl"] = resn[i](mem[reg!"hl"]); });
+            cbSet[op++] = Instruction(format("RES %d,A", i), { reg!"a" = resn[i](reg!"a"); });
+        }
+        assert(op == 0xC0);
+        for (size_t i = 0; i < 8; i++) {
+            cbSet[op++] = Instruction(format("SET %d,B", i), { reg!"b" = setn[i](reg!"b"); });
+            cbSet[op++] = Instruction(format("SET %d,C", i), { reg!"c" = setn[i](reg!"c"); });
+            cbSet[op++] = Instruction(format("SET %d,D", i), { reg!"d" = setn[i](reg!"d"); });
+            cbSet[op++] = Instruction(format("SET %d,E", i), { reg!"e" = setn[i](reg!"e"); });
+            cbSet[op++] = Instruction(format("SET %d,H", i), { reg!"h" = setn[i](reg!"h"); });
+            cbSet[op++] = Instruction(format("SET %d,L", i), { reg!"l" = setn[i](reg!"l"); });
+            cbSet[op++] = Instruction(format("SET %d,(HL)", i), { mem[reg!"hl"] = setn[i](mem[reg!"hl"]); });
+            cbSet[op++] = Instruction(format("SET %d,A", i), { reg!"a" = setn[i](reg!"a"); });
+        }
+        assert(op == 0x00);
         cbSet.rehash();
     }
 
@@ -796,6 +894,101 @@ protected:
         //read next Instruction
         //execute on new set
         cbSet[opcode].nullary();
+    }
+
+    ubyte rlc(ubyte value) {
+        int cary = (value & 0x80) >> 7;
+        flag!'c' = (value & 0x80) != 0 ? 1 : 0;
+        value <<= 1;
+        value += cary;
+        flag!'z' = zero(value);
+        flag!'n' = 0;
+        flag!'h' = 0;
+        return value;
+    }
+
+    ubyte rl(ubyte value) {
+        int cary = flag!'c';
+        flag!'c' = (value & 0x80) != 0 ? 1 : 0;
+        value <<= 1;
+        value += cary;
+        flag!'z' = zero(value);
+        flag!'n' = 0;
+        flag!'h' = 0;
+        return value;
+    }
+
+    ubyte rrc(ubyte value) {
+        int cary = value & 0x01;
+        value >>= 1;
+        value |= cary ? 0x80 : 0;
+        flag!'c' = cary ? 1 : 0;
+        flag!'z' = zero(value);
+        flag!'n' = 0;
+        flag!'h' = 0;
+        return value;
+    }
+
+    ubyte rr(ubyte value) {
+        value >>= 1;
+        value |= flag!'c' ? 0x80 : 0;
+        flag!'c' = value & 0x01;
+        flag!'z' = zero(value);
+        flag!'n' = 0;
+        flag!'h' = 0;
+        return value;
+    }
+
+    ubyte sla(ubyte value) {
+        flag!'c' = (value & 0x80) != 0 ? 1 : 0;
+        value <<= 1;
+        flag!'z' = zero(value);
+        flag!'n' = 0;
+        flag!'h' = 0;
+        return value;
+    }
+
+    ubyte sra(ubyte value) {
+        flag!'c' = value & 0x01;
+        value = (value & 0x80) | (value >> 1);
+        flag!'z' = zero(value);
+        flag!'n' = 0;
+        flag!'h' = 0;
+        return value;
+    }
+
+    ubyte srl(ubyte value) {
+        flag!'c' = value & 0x01;
+        value >>= 1;
+        flag!'z' = zero(value);
+        flag!'n' = 0;
+        flag!'h' = 0;
+        return value;
+    }
+
+    ubyte swap(ubyte value) {
+        value = ((value & 0xF) << 4) | ((value & 0xF0) >> 4);
+        flag!'z' = zero(value);
+        flag!'c' = 0;
+        flag!'n' = 0;
+        flag!'h' = 0;
+        return value;
+    }
+
+    void tbit(size_t i)(ubyte value) {
+        flag!'z' = zero(value.bit!i);
+        flag!'n' = 0;
+        flag!'h' = 1;
+    }
+
+    ubyte set(size_t i)(ubyte value) {
+        value.bit!i = 1;
+        return value;
+    }
+
+    ubyte res(size_t i)(ubyte value) {
+        value.bit!i = 0;
+        return value;
     }
 
 private:
