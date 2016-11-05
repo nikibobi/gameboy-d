@@ -525,26 +525,6 @@ class GameboyCPU : CPU!(8, "abcdefhl")
         cbSet.rehash();
     }
 
-    unittest
-    {
-        //tests which instructions are implemented
-        import std.algorithm : countUntil;
-        auto cpu = new GameboyCPU(new GameboyMemory);
-        ubyte[] none = [0xD3, 0xE3, 0xE4, 0xF4, 0xDB, 0xEB, 0xEC, 0xFC, 0xDD, 0xED, 0xFD];
-        ubyte[] notdone = [];
-        for (int i = 0x00; i <= 0xFF; i++) {
-            auto key = cast(ubyte)i;
-            if (key !in cpu.set) {
-                if (countUntil(none, key) == -1) {
-                    notdone ~= key;
-                }
-            } else {
-                //writeln(cpu.set[key].mnemonic);
-            }
-        }
-        writefln("NOT DONE: %(%02X %)", notdone);
-    }
-
     @property
     T flag(char f)() inout
     if (flags.indexOf(f) != -1) {
