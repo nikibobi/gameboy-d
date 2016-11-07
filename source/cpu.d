@@ -5,41 +5,8 @@ import std.conv;
 import std.string : indexOf;
 import std.format : format;
 import gameboy.memory;
+import gameboy.instruction;
 import gameboy.utils : bitness, isPowerOf2, bit;
-
-struct Instruction
-{
-    private this(string mnemonic) {
-        this.mnemonic = mnemonic;
-    }
-
-    this(string mnemonic, void delegate() op) {
-        this(mnemonic);
-        this.nullary = op;
-        args = 0;
-    }
-
-    this(string mnemonic, void delegate(ubyte) op) {
-        this(mnemonic);
-        this.unary = op;
-        args = 1;
-    }
-
-    this(string mnemonic, void delegate(ushort) op) {
-        this(mnemonic);
-        this.binary = op;
-        args = 2;
-    }
-
-    string mnemonic;
-    union
-    {
-        void delegate() nullary;
-        void delegate(ubyte) unary;
-        void delegate(ushort) binary;
-    }
-    int args;
-}
 
 class Processor
 {
