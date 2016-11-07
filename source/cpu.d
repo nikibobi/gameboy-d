@@ -584,7 +584,7 @@ class Processor
                 opSet[opcode].unary(arg);
                 break;
             case 2:
-                ushort arg = cast(ushort)((mem[pc + 1] << 8) | mem[pc]);
+                ushort arg = (mem[pc + 1] << 8) | mem[pc];
                 pc += 2;
                 writefln(opSet[opcode].mnemonic, arg);
                 opSet[opcode].binary(arg);
