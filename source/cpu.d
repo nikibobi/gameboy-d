@@ -258,8 +258,8 @@ class Processor
             0x3F: Instruction("CCF", &ccf),
             0x37: Instruction("SCF", &scf),
 
-            0xF3: Instruction("DI", { interupts(false); }),
-            0xFB: Instruction("EI", { interupts(true); }),
+            0xF3: Instruction("DI", { interrupts = false; }),
+            0xFB: Instruction("EI", { interrupts = true; }),
 
             0x07: Instruction("RLCA", &rlca),
             0x17: Instruction("RLA", &rla),
@@ -299,7 +299,7 @@ class Processor
             0xC8: Instruction("RET Z", { if (flag!'z' != 0) ret(); }),
             0xD0: Instruction("RET NC", { if (flag!'c' == 0) ret(); }),
             0xD8: Instruction("RET C", { if (flag!'c' != 0) ret(); }),
-            0xD9: Instruction("RETI", { ret(); interupts(true); }),
+            0xD9: Instruction("RETI", { ret(); interrupts = true; }),
 
             0xCB: Instruction("PREFIX CB", &cb)
         ];
@@ -529,6 +529,7 @@ class Processor
         reg!"hl" = 0x014D;
         reg!"sp" = 0xFFFE;
         reg!"pc" = 0x100;
+        interrupts = true;
         mem[0xFF05] = 0x00;
         mem[0xFF06] = 0x00;
         mem[0xFF07] = 0x00;
@@ -589,6 +590,41 @@ class Processor
                 writefln(opSet[opcode].mnemonic, arg);
                 opSet[opcode].binary(arg);
                 break;
+        }
+        //TODO: increment ticks
+    }
+
+    void fireInterrupts() {
+        if (!interrupts)
+            return;
+        auto enable = mem[0xFFFF];
+        auto flags = mem[0xFF0F];
+        ubyte fired = enable & flags;
+        // Vertical blank
+        if (fired.bit!0) {
+            flags.bit!0 = 0;
+            //TODO: render here
+            interrupt!0x40();
+        }
+        // LCD status
+        if (fired.bit!1) {
+            flags.bit!1 = 0;
+            interrupt!0x48();
+        }
+        // Timer overflow
+        if (fired.bit!2) {
+            flags.bit!2 = 0;
+            interrupt!0x50();
+        }
+        // Serial link
+        if (fired.bit!3) {
+            flags.bit!3 = 0;
+            interrupt!0x58();
+        }
+        // Joypad press
+        if (fired.bit!4) {
+            flags.bit!4 = 0;
+            interrupt!0x60();
         }
     }
 
@@ -856,8 +892,10 @@ protected:
         pc = pop();
     }
 
-    void interupts(bool enable) {
-        //TODO: enable or disable interupts
+    void interrupt(ushort value)() {
+        interrupts = false;
+        rst!value();
+        //TODO: ticks
     }
 
     void cb(ubyte opcode) {
@@ -964,6 +1002,7 @@ protected:
 private:
     T[char] regs;
     ushort pc, sp;
+    bool interrupts;
     GameboyMemory mem;
     Instruction[ubyte] opSet;
     Instruction[ubyte] cbSet;
