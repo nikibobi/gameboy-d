@@ -14,7 +14,7 @@ class Processor
     enum bits = 8;
     enum flags = "chnz";
 
-    this(GameboyMemory mem) {
+    this(Memory mem) {
         this.mem = mem;
         opSet = [
             0x00: Instruction("NOP", &nop),
@@ -443,7 +443,7 @@ class Processor
     }
 
     unittest {
-        auto mem = new GameboyMemory;
+        auto mem = new Memory;
         auto cpu = new Processor(mem);
         assert(is(typeof(cpu.reg!"pc") == ushort));
         assert(is(typeof(cpu.reg!"sp") == ushort));
@@ -482,7 +482,7 @@ class Processor
     }
 
     unittest {
-        auto mem = new GameboyMemory;
+        auto mem = new Memory;
         auto cpu = new Processor(mem);
         cpu.reg!"abcdefhl" = 0x0001020304050607;
 
@@ -511,7 +511,7 @@ class Processor
     }
 
     unittest {
-        auto cpu = new Processor(new GameboyMemory);
+        auto cpu = new Processor(new Memory);
                       //znhc ____
         cpu.reg!"f" = 0b0010_0000;
         assert(cpu.flag!'h' == 1);
@@ -564,7 +564,7 @@ class Processor
     }
 
     unittest {
-        auto mem = new GameboyMemory;
+        auto mem = new Memory;
         auto cpu = new Processor(mem);
         cpu.boot();
         assert(cpu.reg!"abcdefhl" == 0x01001300D8B0014D);
@@ -1003,7 +1003,7 @@ private:
     T[char] regs;
     ushort pc, sp;
     bool interrupts;
-    GameboyMemory mem;
+    Memory mem;
     Instruction[ubyte] opSet;
     Instruction[ubyte] cbSet;
 }
