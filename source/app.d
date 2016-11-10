@@ -39,6 +39,7 @@ void main(string[] args)
                 window.close();
             }
         }
+        debug debugCPU(cpu);
         cpu.step();
         //update here
         window.clear();
@@ -46,6 +47,19 @@ void main(string[] args)
         window.draw(triangle, PrimitiveType.Quads);
         window.display();
     }
+}
+
+void debugCPU(Processor cpu) {
+    auto file = File("debug.txt", "w");
+    scope(exit) file.close();
+    file.writefln("A: $%02X", cpu.reg!"a");
+    file.writefln("F: %s%s%s%s", (cpu.flag!'z'?'z':'-'), (cpu.flag!'n'?'n':'-'), (cpu.flag!'h'?'h':'-'), (cpu.flag!'c'?'c':'-'));
+    file.writefln("BC: $%04X", cpu.reg!"bc");
+    file.writefln("DE: $%04X", cpu.reg!"de");
+    file.writefln("HL: $%04X", cpu.reg!"hl");
+    file.writefln("(HL): $%02X", cpu.reg!"(hl)");
+    file.writefln("SP: $%04X", cpu.reg!"sp");
+    file.writefln("PC: $%04X", cpu.reg!"pc");
 }
 
 void readROMs() {

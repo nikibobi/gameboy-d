@@ -114,7 +114,7 @@ class Memory
                 return reads[range](address - range.begin);
             }
         }
-        writefln("Unhandled Read: $%04X", address);
+        debug writefln("Unhandled Read: $%04X", address);
         return 0;
     }
 
@@ -128,7 +128,7 @@ class Memory
                 return;
             }
         }
-        writefln("Unhandled Write: $%04X", address);
+        debug writefln("Unhandled Write: $%04X", address);
     }
 
     size_t opDollar() inout {

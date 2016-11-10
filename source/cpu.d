@@ -580,18 +580,18 @@ class Processor
         ubyte opcode = mem[pc++];
         final switch (opSet[opcode].args) {
             case 0:
-                writeln(opSet[opcode].mnemonic);
+                debug writeln(opSet[opcode].mnemonic);
                 opSet[opcode].nullary();
                 break;
             case 1:
                 ubyte arg = mem[pc++];
-                writefln(opSet[opcode].mnemonic, arg);
+                debug writefln(opSet[opcode].mnemonic, arg);
                 opSet[opcode].unary(arg);
                 break;
             case 2:
                 ushort arg = (mem[pc + 1] << 8) | mem[pc];
                 pc += 2;
-                writefln(opSet[opcode].mnemonic, arg);
+                debug writefln(opSet[opcode].mnemonic, arg);
                 opSet[opcode].binary(arg);
                 break;
         }
