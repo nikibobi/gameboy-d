@@ -16,6 +16,8 @@ class Processor
 
     this(Memory mem) {
         this.mem = mem;
+        mem.mount(interruptFlags, 0xFF0F);
+        mem.mount(interruptEnable, 0xFFFF);
         opSet = [
             0x00: Instruction("NOP", &nop),
             0x76: Instruction("HALT", &halt),
@@ -530,6 +532,8 @@ class Processor
         reg!"sp" = 0xFFFE;
         reg!"pc" = 0x100;
         interrupts = true;
+        interruptEnable = 0;
+        interruptFlags = 0;
         mem[0xFF05] = 0x00;
         mem[0xFF06] = 0x00;
         mem[0xFF07] = 0x00;
@@ -597,33 +601,31 @@ class Processor
     void fireInterrupts() {
         if (!interrupts)
             return;
-        auto enable = mem[0xFFFF];
-        auto flags = mem[0xFF0F];
-        ubyte fired = enable & flags;
+        ubyte fired = interruptEnable & interruptFlags;
         // Vertical blank
         if (fired.bit!0) {
-            flags.bit!0 = 0;
+            interruptFlags.bit!0 = 0;
             //TODO: render here
             interrupt!0x40();
         }
         // LCD status
         if (fired.bit!1) {
-            flags.bit!1 = 0;
+            interruptFlags.bit!1 = 0;
             interrupt!0x48();
         }
         // Timer overflow
         if (fired.bit!2) {
-            flags.bit!2 = 0;
+            interruptFlags.bit!2 = 0;
             interrupt!0x50();
         }
         // Serial link
         if (fired.bit!3) {
-            flags.bit!3 = 0;
+            interruptFlags.bit!3 = 0;
             interrupt!0x58();
         }
         // Joypad press
         if (fired.bit!4) {
-            flags.bit!4 = 0;
+            interruptFlags.bit!4 = 0;
             interrupt!0x60();
         }
     }
@@ -1003,6 +1005,7 @@ private:
     T[char] regs;
     ushort pc, sp;
     bool interrupts;
+    ubyte interruptEnable, interruptFlags;
     Memory mem;
     Instruction[ubyte] opSet;
     Instruction[ubyte] cbSet;
