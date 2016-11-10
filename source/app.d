@@ -4,6 +4,7 @@ import std.stdio;
 import dsfml.system;
 import dsfml.window;
 import dsfml.graphics;
+import gameboy.cpu;
 import gameboy.memory;
 import gameboy.rom;
 import gameboy.utils;
@@ -12,6 +13,10 @@ void main(string[] args)
 {
     readROMs();
     auto cart = Cartage.fromFile("roms/Tetris.gb");
+    auto ram = new Memory;
+    ram.loadCartage(cart);
+    auto cpu = new Processor(ram);
+    cpu.boot();
 
     enum PixelSize = 2;
     immutable screenSize = Vector2u(160, 144) * PixelSize;
@@ -34,6 +39,7 @@ void main(string[] args)
                 window.close();
             }
         }
+        cpu.step();
         //update here
         window.clear();
         //draw here
