@@ -107,6 +107,12 @@ class Cartage
         return rom[0x014C];
     }
 
+    ubyte opIndex(size_t address) inout {
+        if (address < 0 || address > 0x8000)
+            return 0;
+        return rom[address];
+    }
+
 private:
     immutable ubyte[] rom;
 
