@@ -103,3 +103,24 @@ unittest {
     val.bit!1 = 0;
     assert(val == 0b01);
 }
+
+bool inType(T, U)(U value) {
+    return T.min <= value && value <= T.max;
+}
+
+unittest {
+    static assert(inType!ushort(0));
+    static assert(inType!ushort(0xFFFF));
+    static assert(!inType!ushort(-1));
+    static assert(!inType!ushort(0x10000));
+
+    static assert(inType!ubyte(0));
+    static assert(inType!ubyte(0xFF));
+    static assert(!inType!ubyte(-1));
+    static assert(!inType!ubyte(0x100));
+
+    static assert(inType!byte(-128));
+    static assert(inType!byte(127));
+    static assert(!inType!byte(-129));
+    static assert(!inType!byte(128));
+}
