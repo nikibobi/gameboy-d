@@ -10,7 +10,7 @@ import gameboy.utils : bitness, isPowerOf2, bit;
 
 class Processor
 {
-    alias ubyte T;
+    alias T = ubyte;
     enum bits = 8;
     enum flags = "chnz";
 

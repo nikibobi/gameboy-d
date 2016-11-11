@@ -9,10 +9,10 @@ import gameboy.utils;
 
 class Memory
 {
-    alias ushort T;
-    alias Tuple!(size_t, "begin", size_t, "end") Range;
-    alias ubyte delegate(size_t) readfn;
-    alias void delegate(size_t, ubyte) writefn;
+    alias T = ushort;
+    alias Range = Tuple!(size_t, "begin", size_t, "end");
+    alias readfn = ubyte delegate(size_t);
+    alias writefn = void delegate(size_t, ubyte);
 
     this() {
         xram = new ubyte[0x2000];
