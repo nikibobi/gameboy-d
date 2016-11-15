@@ -6,6 +6,7 @@ import dsfml.window;
 import dsfml.graphics;
 import gameboy.cpu;
 import gameboy.memory;
+import gameboy.video;
 import gameboy.rom;
 import gameboy.utils;
 
@@ -16,6 +17,7 @@ void main(string[] args)
     auto ram = new Memory;
     ram.loadCartage(cart);
     auto cpu = new Processor(ram);
+    auto gpu = new Video(ram);
     cpu.boot();
 
     enum PixelSize = 2;
@@ -40,7 +42,10 @@ void main(string[] args)
             }
         }
         debug debugCPU(cpu);
+        debug debugGPU(gpu);
         cpu.step();
+        gpu.step(1);
+        cpu.fireInterrupts();
         //update here
         window.clear();
         //draw here
@@ -60,6 +65,17 @@ void debugCPU(Processor cpu) {
     file.writefln("(HL): $%02X", cpu.reg!"(hl)");
     file.writefln("SP: $%04X", cpu.reg!"sp");
     file.writefln("PC: $%04X", cpu.reg!"pc");
+}
+
+void debugGPU(Video gpu) {
+    auto frame = new Image;
+    frame.create(Video.Width, Video.Height, Color.Black);
+    for (int y = 0; y < Video.Height; y++) {
+        for (int x = 0; x < Video.Width; x++) {
+            frame.setPixel(x, y, gpu.buffer[y * Video.Width + x]);
+        }
+    }
+    frame.saveToFile("buffer.png");
 }
 
 void readROMs() {

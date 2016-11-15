@@ -3,6 +3,7 @@ module gameboy.memory;
 import std.stdio;
 import std.format : format;
 import std.typecons : Tuple, tuple;
+import std.random : uniform;
 import core.exception : RangeError;
 import gameboy.rom;
 import gameboy.utils;
@@ -16,22 +17,19 @@ class Memory
 
     this() {
         xram = new ubyte[0x2000];
-        vram = new ubyte[0x2000];
         wram = new ubyte[0x2000];
-        oam = new ubyte[0x100];
         zram = new ubyte[0x80];
         io = new ubyte[0x100];
-        this.mount();
+        mount();
     }
 
     void mount() {
-        mount(vram, 0x8000);
         mount(xram, 0xA000);
         mount(wram, 0xC000);
         mount(wram, 0xE000, 0xFE00);
-        mount(oam, 0xFE00);
         mount(io, 0xFF00, 0xFF80);
         mount(zram, 0xFF80, 0xFFFF);
+        mount((size_t address) => uniform!ubyte(), 0xFF04);
     }
 
     void mount(readfn fn, size_t begin, size_t end) {
@@ -42,6 +40,14 @@ class Memory
     void mount(writefn fn, size_t begin, size_t end) {
         auto key = Range(begin, end);
         writes[key] = fn;
+    }
+
+    void mount(readfn fn, size_t begin) {
+        mount(fn, begin, begin + 1);
+    }
+
+    void mount(writefn fn, size_t begin) {
+        mount(fn, begin, begin + 1);
     }
 
     void mount(char mode : 'r')(ref const ubyte[] data, size_t begin, size_t end) {
@@ -55,7 +61,7 @@ class Memory
 
     void mount(char mode : 'r')(ref const ubyte data, size_t begin) {
         auto fn = (size_t address) { return data; };
-        mount(fn, begin, begin + 1);
+        mount(fn, begin);
     }
 
     void mount(char mode : 'w')(ref ubyte[] data, size_t begin, size_t end) {
@@ -69,7 +75,7 @@ class Memory
 
     void mount(char mode : 'w')(ref ubyte data, size_t begin) {
         auto fn = (size_t address, ubyte value) { data = value; };
-        mount(fn, begin, begin + 1);
+        mount(fn, begin);
     }
 
     void mount(ref ubyte[] data, size_t begin, size_t end) {
@@ -146,5 +152,5 @@ class Memory
 private:
     readfn[Range] reads;
     writefn[Range] writes;
-    ubyte[] xram, vram, wram, oam, io, zram;
+    ubyte[] xram, wram, io, zram;
 }
