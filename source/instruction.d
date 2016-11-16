@@ -32,7 +32,7 @@ struct Instruction
     }
 
     @property
-    size_t args() {
+    size_t args() inout {
         return this.bytes;
     }
 

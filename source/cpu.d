@@ -269,23 +269,23 @@ class Processor
             0x1F: Instruction("RRA", &rra),
 
             0xC3: Instruction("JP $%04X", &jp),
-            0xC2: Instruction("JP NZ,$%04X", (ushort n) { if (!flag!'z') jp(n); }),
-            0xCA: Instruction("JP Z,$%04X", (ushort n) { if (flag!'z') jp(n); }),
-            0xD2: Instruction("JP NC,$%04X", (ushort n) { if (!flag!'c') jp(n); }),
-            0xDA: Instruction("JP C,$%04X", (ushort n) { if (flag!'c') jp(n); }),
+            0xC2: Instruction("JP NZ,$%04X", &jpif!('z', 0)),
+            0xCA: Instruction("JP Z,$%04X", &jpif!('z', 1)),
+            0xD2: Instruction("JP NC,$%04X", &jpif!('c', 0)),
+            0xDA: Instruction("JP C,$%04X", &jpif!('c', 1)),
             0xE9: Instruction("JP (HL)", { jp(reg!"hl"); }),
 
             0x18: Instruction("JR $%02X", &jr),
-            0x20: Instruction("JR NZ,$%02X", (ubyte n) { if (!flag!'z') jr(n); }),
-            0x28: Instruction("JR Z,$%02X", (ubyte n) { if (flag!'z') jr(n); }),
-            0x30: Instruction("JR NC,$%02X", (ubyte n) { if (!flag!'c') jr(n); }),
-            0x38: Instruction("JR C,$%02X", (ubyte n) { if (flag!'c') jr(n); }),
+            0x20: Instruction("JR NZ,$%02X", &jrif!('z', 0)),
+            0x28: Instruction("JR Z,$%02X", &jrif!('z', 1)),
+            0x30: Instruction("JR NC,$%02X", &jrif!('c', 0)),
+            0x38: Instruction("JR C,$%02X", &jrif!('c', 1)),
 
             0xCD: Instruction("CALL $%04X", &call),
-            0xC4: Instruction("CALL NZ,$%04X", (ushort n) { if (!flag!'z') call(n); }),
-            0xCC: Instruction("CALL Z,$%04X", (ushort n) { if (flag!'z') call(n); }),
-            0xD4: Instruction("CALL NC,$%04X", (ushort n) { if (!flag!'c') call(n); }),
-            0xDC: Instruction("CALL C,$%04X", (ushort n) { if (flag!'c') call(n); }),
+            0xC4: Instruction("CALL NZ,$%04X", &callif!('z', 0)),
+            0xCC: Instruction("CALL Z,$%04X", &callif!('z', 1)),
+            0xD4: Instruction("CALL NC,$%04X", &callif!('c', 0)),
+            0xDC: Instruction("CALL C,$%04X", &callif!('c', 1)),
 
             0xC7: Instruction("RST 00H", &rst!0x00),
             0xCF: Instruction("RST 08H", &rst!0x08),
@@ -297,10 +297,10 @@ class Processor
             0xFF: Instruction("RST 38H", &rst!0x38),
 
             0xC9: Instruction("RET", &ret),
-            0xC0: Instruction("RET NZ", { if (!flag!'z') ret(); }),
-            0xC8: Instruction("RET Z", { if (flag!'z') ret(); }),
-            0xD0: Instruction("RET NC", { if (!flag!'c') ret(); }),
-            0xD8: Instruction("RET C", { if (flag!'c') ret(); }),
+            0xC0: Instruction("RET NZ", &retif!('z', 0)),
+            0xC8: Instruction("RET Z", &retif!('z', 1)),
+            0xD0: Instruction("RET NC", &retif!('c', 0)),
+            0xD8: Instruction("RET C", &retif!('c', 1)),
             0xD9: Instruction("RETI", { ret(); interrupts = true; }),
 
             0xCB: Instruction("PREFIX CB", &cb)
@@ -417,6 +417,47 @@ class Processor
         }
         assert(op == 0x00);
         cbSet.rehash();
+    }
+
+    static this() {
+        opTicks = [
+        // _0 _1 _2 _3 _4 _5 _6 _7 _8 _9 _A _B _C _D _E _F
+            4,12, 8, 8, 4, 4, 8, 4,20, 8, 8, 8, 4, 4, 8, 4, // 0_
+            4,12, 8, 8, 4, 4, 8, 4,12, 8, 8, 8, 4, 4, 8, 4, // 1_
+            8,12, 8, 8, 4, 4, 8, 4, 8, 8, 8, 8, 4, 4, 8, 4, // 2_
+            8,12, 8, 8,12,12,12, 4, 8, 8, 8, 8, 4, 4, 8, 4, // 3_
+            4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4, // 4_
+            4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4, // 5_
+            4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4, // 6_
+            8, 8, 8, 8, 8, 8, 4, 8, 4, 4, 4, 4, 4, 4, 8, 4, // 7_
+            4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4, // 8_
+            4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4, // 9_
+            4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4, // A_
+            4, 4, 4, 4, 4, 4, 8, 4, 4, 4, 4, 4, 4, 4, 8, 4, // B_
+            8,12,12,16,12,16, 8,16, 8,16,12, 4,12,24, 8,16, // C_
+            8,12,12, 0,12,16, 8,16, 8,16,12, 0,12, 0, 8,16, // D_
+           12,12, 8, 0, 0,16, 8,16,16, 4,16, 0, 0, 0, 8,16, // E_
+           12,12, 8, 4, 0,16, 8,16,12, 8,16, 4, 0, 0, 8,16  // F_
+        ];
+        cbTicks = [
+        // _0 _1 _2 _3 _4 _5 _6 _7 _8 _9 _A _B _C _D _E _F
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 0_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 1_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 2_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 3_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 4_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 5_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 6_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 7_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 8_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // 9_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // A_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // B_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // C_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // D_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8, // E_
+            8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8  // F_
+        ];
     }
 
     @property
@@ -577,25 +618,32 @@ class Processor
     }
 
     void step() {
-        ubyte opcode = mem[pc++];
-        final switch (opSet[opcode].args) {
+        immutable opcode = mem[pc++];
+        step(opSet, opTicks, opcode);
+    }
+
+    private void step(const Instruction[ubyte] set, ref const ubyte[0x100] times, ubyte opcode) {
+        immutable instr = set[opcode];
+        final switch (instr.args) {
             case 0:
-                debug writeln(opSet[opcode].mnemonic);
-                opSet[opcode].nullary();
+                pc += instr.args;
+                debug writeln(instr.mnemonic);
+                instr.nullary();
                 break;
             case 1:
-                ubyte arg = mem[pc++];
-                debug writefln(opSet[opcode].mnemonic, arg);
-                opSet[opcode].unary(arg);
+                ubyte arg = mem[pc];
+                pc += instr.args;
+                debug writefln(instr.mnemonic, arg);
+                instr.unary(arg);
                 break;
             case 2:
                 ushort arg = (mem[pc + 1] << 8) | mem[pc];
-                pc += 2;
-                debug writefln(opSet[opcode].mnemonic, arg);
-                opSet[opcode].binary(arg);
+                pc += instr.args;
+                debug writefln(instr.mnemonic, arg);
+                instr.binary(arg);
                 break;
         }
-        //TODO: increment ticks
+        ticks += times[opcode];
     }
 
     void fireInterrupts() {
@@ -876,13 +924,34 @@ protected:
         pc = value;
     }
 
+    void jpif(char f, bool test)(ushort value) {
+        if (flag!f == test) {
+            jp(value);
+            ticks += 4;
+        }
+    }
+
     void jr(ubyte value) {
         pc += cast(byte)value;
+    }
+
+    void jrif(char f, bool test)(ubyte value) {
+        if (flag!f == test) {
+            jr(value);
+            ticks += 4;
+        }
     }
 
     void call(ushort value) {
         push(pc);
         pc = value;
+    }
+
+    void callif(char f, bool test)(ushort value) {
+        if (flag!f == test) {
+            call(value);
+            ticks += 12;
+        }
     }
 
     void rst(ushort value)() {
@@ -894,16 +963,21 @@ protected:
         pc = pop();
     }
 
+    void retif(char f, bool test)() {
+        if (flag!f == test) {
+            ret();
+            ticks += 12;
+        }
+    }
+
     void interrupt(ushort value)() {
         interrupts = false;
         rst!value();
-        //TODO: ticks
+        ticks += 12;
     }
 
     void cb(ubyte opcode) {
-        //read next Instruction
-        //execute on new set
-        cbSet[opcode].nullary();
+        step(cbSet, cbTicks, opcode);
     }
 
     ubyte rlc(ubyte value) {
@@ -1004,9 +1078,10 @@ protected:
 private:
     T[char] regs;
     ushort pc, sp;
+    size_t ticks;
     bool interrupts;
     ubyte interruptEnable, interruptFlags;
     Memory mem;
-    Instruction[ubyte] opSet;
-    Instruction[ubyte] cbSet;
+    Instruction[ubyte] opSet, cbSet;
+    static immutable ubyte[0x100] opTicks, cbTicks;
 }
