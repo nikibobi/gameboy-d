@@ -618,6 +618,8 @@ class Processor
     }
 
     void step() {
+        if (stopped)
+            return;
         immutable opcode = mem[pc++];
         step(opSet, opTicks, opcode);
     }
@@ -709,7 +711,7 @@ protected:
     void stop(ubyte value) {
         if (value != 0)
             return;
-        //stop the cpu
+        stopped = true;
     }
 
     void ldhl(ubyte value) {
@@ -1079,6 +1081,7 @@ private:
     T[char] regs;
     ushort pc, sp;
     size_t ticks;
+    bool stopped;
     bool interrupts;
     ubyte interruptEnable, interruptFlags;
     Memory mem;
