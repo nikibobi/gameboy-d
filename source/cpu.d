@@ -21,7 +21,7 @@ class Processor
         opSet = [
             0x00: Instruction("NOP", &nop),
             0x76: Instruction("HALT", &halt),
-            0x10: Instruction("STOP 0", &stop),
+            0x10: Instruction("STOP %X", &stop),
 
             0x01: Instruction("LD BC,$%04X", (ushort n) { reg!"bc" = n; }),
             0x11: Instruction("LD DE,$%04X", (ushort n) { reg!"de" = n; }),
@@ -303,7 +303,7 @@ class Processor
             0xD8: Instruction("RET C", &retif!('c', 1)),
             0xD9: Instruction("RETI", { ret(); interrupts = true; }),
 
-            0xCB: Instruction("PREFIX CB", &cb)
+            0xCB: Instruction("PREFIX CB %02X", &cb)
         ];
         opSet.rehash();
         cbSet = [
@@ -805,25 +805,27 @@ class Processor
 
     private void step(const Instruction[ubyte] set, ref const ubyte[0x100] times, ubyte opcode) {
         immutable instr = set[opcode];
+        string mnemonic;
         final switch (instr.args) {
             case 0:
+                mnemonic = instr.mnemonic;
                 pc += instr.args;
-                debug writeln(instr.mnemonic);
                 instr.nullary();
                 break;
             case 1:
                 ubyte arg = mem[pc];
+                mnemonic = format(instr.mnemonic, arg);
                 pc += instr.args;
-                debug writefln(instr.mnemonic, arg);
                 instr.unary(arg);
                 break;
             case 2:
                 ushort arg = (mem[pc + 1] << 8) | mem[pc];
+                mnemonic = format(instr.mnemonic, arg);
                 pc += instr.args;
-                debug writefln(instr.mnemonic, arg);
                 instr.binary(arg);
                 break;
         }
+        debug writeln(mnemonic);
         ticks += times[opcode];
     }
 
@@ -834,7 +836,6 @@ class Processor
         // Vertical blank
         if (fired.bit!0) {
             interruptFlags.bit!0 = 0;
-            //TODO: render here
             interrupt!0x40();
         }
         // LCD status
