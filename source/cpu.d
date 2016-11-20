@@ -378,44 +378,223 @@ class Processor
             0x3D: Instruction("SRL L", { reg!"l" = srl(reg!"l"); }),
             0x3E: Instruction("SRL (HL)", { reg!"(hl)" = srl(reg!"(hl)"); }),
             0x3F: Instruction("SRL A", { reg!"a" = srl(reg!"a"); }),
+
+            0x40: Instruction("BIT 0,B", { tbit!0(reg!"b"); }),
+            0x41: Instruction("BIT 0,C", { tbit!0(reg!"c"); }),
+            0x42: Instruction("BIT 0,D", { tbit!0(reg!"d"); }),
+            0x43: Instruction("BIT 0,E", { tbit!0(reg!"e"); }),
+            0x44: Instruction("BIT 0,H", { tbit!0(reg!"h"); }),
+            0x45: Instruction("BIT 0,L", { tbit!0(reg!"l"); }),
+            0x46: Instruction("BIT 0,(HL)", { tbit!0(reg!"(hl)"); }),
+            0x47: Instruction("BIT 0,A", { tbit!0(reg!"a"); }),
+
+            0x48: Instruction("BIT 1,B", { tbit!1(reg!"b"); }),
+            0x49: Instruction("BIT 1,C", { tbit!1(reg!"c"); }),
+            0x4A: Instruction("BIT 1,D", { tbit!1(reg!"d"); }),
+            0x4B: Instruction("BIT 1,E", { tbit!1(reg!"e"); }),
+            0x4C: Instruction("BIT 1,H", { tbit!1(reg!"h"); }),
+            0x4D: Instruction("BIT 1,L", { tbit!1(reg!"l"); }),
+            0x4E: Instruction("BIT 1,(HL)", { tbit!1(reg!"(hl)"); }),
+            0x4F: Instruction("BIT 1,A", { tbit!1(reg!"a"); }),
+
+            0x50: Instruction("BIT 2,B", { tbit!2(reg!"b"); }),
+            0x51: Instruction("BIT 2,C", { tbit!2(reg!"c"); }),
+            0x52: Instruction("BIT 2,D", { tbit!2(reg!"d"); }),
+            0x53: Instruction("BIT 2,E", { tbit!2(reg!"e"); }),
+            0x54: Instruction("BIT 2,H", { tbit!2(reg!"h"); }),
+            0x55: Instruction("BIT 2,L", { tbit!2(reg!"l"); }),
+            0x56: Instruction("BIT 2,(HL)", { tbit!2(reg!"(hl)"); }),
+            0x57: Instruction("BIT 2,A", { tbit!2(reg!"a"); }),
+
+            0x58: Instruction("BIT 3,B", { tbit!3(reg!"b"); }),
+            0x59: Instruction("BIT 3,C", { tbit!3(reg!"c"); }),
+            0x5A: Instruction("BIT 3,D", { tbit!3(reg!"d"); }),
+            0x5B: Instruction("BIT 3,E", { tbit!3(reg!"e"); }),
+            0x5C: Instruction("BIT 3,H", { tbit!3(reg!"h"); }),
+            0x5D: Instruction("BIT 3,L", { tbit!3(reg!"l"); }),
+            0x5E: Instruction("BIT 3,(HL)", { tbit!3(reg!"(hl)"); }),
+            0x5F: Instruction("BIT 3,A", { tbit!3(reg!"a"); }),
+
+            0x60: Instruction("BIT 4,B", { tbit!4(reg!"b"); }),
+            0x61: Instruction("BIT 4,C", { tbit!4(reg!"c"); }),
+            0x62: Instruction("BIT 4,D", { tbit!4(reg!"d"); }),
+            0x63: Instruction("BIT 4,E", { tbit!4(reg!"e"); }),
+            0x64: Instruction("BIT 4,H", { tbit!4(reg!"h"); }),
+            0x65: Instruction("BIT 4,L", { tbit!4(reg!"l"); }),
+            0x66: Instruction("BIT 4,(HL)", { tbit!4(reg!"(hl)"); }),
+            0x67: Instruction("BIT 4,A", { tbit!4(reg!"a"); }),
+
+            0x68: Instruction("BIT 5,B", { tbit!5(reg!"b"); }),
+            0x69: Instruction("BIT 5,C", { tbit!5(reg!"c"); }),
+            0x6A: Instruction("BIT 5,D", { tbit!5(reg!"d"); }),
+            0x6B: Instruction("BIT 5,E", { tbit!5(reg!"e"); }),
+            0x6C: Instruction("BIT 5,H", { tbit!5(reg!"h"); }),
+            0x6D: Instruction("BIT 5,L", { tbit!5(reg!"l"); }),
+            0x6E: Instruction("BIT 5,(HL)", { tbit!5(reg!"(hl)"); }),
+            0x6F: Instruction("BIT 5,A", { tbit!5(reg!"a"); }),
+
+            0x70: Instruction("BIT 6,B", { tbit!6(reg!"b"); }),
+            0x71: Instruction("BIT 6,C", { tbit!6(reg!"c"); }),
+            0x72: Instruction("BIT 6,D", { tbit!6(reg!"d"); }),
+            0x73: Instruction("BIT 6,E", { tbit!6(reg!"e"); }),
+            0x74: Instruction("BIT 6,H", { tbit!6(reg!"h"); }),
+            0x75: Instruction("BIT 6,L", { tbit!6(reg!"l"); }),
+            0x76: Instruction("BIT 6,(HL)", { tbit!6(reg!"(hl)"); }),
+            0x77: Instruction("BIT 6,A", { tbit!6(reg!"a"); }),
+
+            0x78: Instruction("BIT 7,B", { tbit!7(reg!"b"); }),
+            0x79: Instruction("BIT 7,C", { tbit!7(reg!"c"); }),
+            0x7A: Instruction("BIT 7,D", { tbit!7(reg!"d"); }),
+            0x7B: Instruction("BIT 7,E", { tbit!7(reg!"e"); }),
+            0x7C: Instruction("BIT 7,H", { tbit!7(reg!"h"); }),
+            0x7D: Instruction("BIT 7,L", { tbit!7(reg!"l"); }),
+            0x7E: Instruction("BIT 7,(HL)", { tbit!7(reg!"(hl)"); }),
+            0x7F: Instruction("BIT 7,A", { tbit!7(reg!"a"); }),
+
+            0x80: Instruction("RES 0,B", { reg!"b" = res!0(reg!"b"); }),
+            0x81: Instruction("RES 0,C", { reg!"c" = res!0(reg!"c"); }),
+            0x82: Instruction("RES 0,D", { reg!"d" = res!0(reg!"d"); }),
+            0x83: Instruction("RES 0,E", { reg!"e" = res!0(reg!"e"); }),
+            0x84: Instruction("RES 0,H", { reg!"h" = res!0(reg!"h"); }),
+            0x85: Instruction("RES 0,L", { reg!"l" = res!0(reg!"l"); }),
+            0x86: Instruction("RES 0,(HL)", { reg!"(hl)" = res!0(reg!"(hl)"); }),
+            0x87: Instruction("RES 0,A", { reg!"a" = res!0(reg!"a"); }),
+
+            0x88: Instruction("RES 1,B", { reg!"b" = res!1(reg!"b"); }),
+            0x89: Instruction("RES 1,C", { reg!"c" = res!1(reg!"c"); }),
+            0x8A: Instruction("RES 1,D", { reg!"d" = res!1(reg!"d"); }),
+            0x8B: Instruction("RES 1,E", { reg!"e" = res!1(reg!"e"); }),
+            0x8C: Instruction("RES 1,H", { reg!"h" = res!1(reg!"h"); }),
+            0x8D: Instruction("RES 1,L", { reg!"l" = res!1(reg!"l"); }),
+            0x8E: Instruction("RES 1,(HL)", { reg!"(hl)" = res!1(reg!"(hl)"); }),
+            0x8F: Instruction("RES 1,A", { reg!"a" = res!1(reg!"a"); }),
+
+            0x90: Instruction("RES 2,B", { reg!"b" = res!2(reg!"b"); }),
+            0x91: Instruction("RES 2,C", { reg!"c" = res!2(reg!"c"); }),
+            0x92: Instruction("RES 2,D", { reg!"d" = res!2(reg!"d"); }),
+            0x93: Instruction("RES 2,E", { reg!"e" = res!2(reg!"e"); }),
+            0x94: Instruction("RES 2,H", { reg!"h" = res!2(reg!"h"); }),
+            0x95: Instruction("RES 2,L", { reg!"l" = res!2(reg!"l"); }),
+            0x96: Instruction("RES 2,(HL)", { reg!"(hl)" = res!2(reg!"(hl)"); }),
+            0x97: Instruction("RES 2,A", { reg!"a" = res!2(reg!"a"); }),
+
+            0x98: Instruction("RES 3,B", { reg!"b" = res!3(reg!"b"); }),
+            0x99: Instruction("RES 3,C", { reg!"c" = res!3(reg!"c"); }),
+            0x9A: Instruction("RES 3,D", { reg!"d" = res!3(reg!"d"); }),
+            0x9B: Instruction("RES 3,E", { reg!"e" = res!3(reg!"e"); }),
+            0x9C: Instruction("RES 3,H", { reg!"h" = res!3(reg!"h"); }),
+            0x9D: Instruction("RES 3,L", { reg!"l" = res!3(reg!"l"); }),
+            0x9E: Instruction("RES 3,(HL)", { reg!"(hl)" = res!3(reg!"(hl)"); }),
+            0x9F: Instruction("RES 3,A", { reg!"a" = res!3(reg!"a"); }),
+
+            0xA0: Instruction("RES 4,B", { reg!"b" = res!4(reg!"b"); }),
+            0xA1: Instruction("RES 4,C", { reg!"c" = res!4(reg!"c"); }),
+            0xA2: Instruction("RES 4,D", { reg!"d" = res!4(reg!"d"); }),
+            0xA3: Instruction("RES 4,E", { reg!"e" = res!4(reg!"e"); }),
+            0xA4: Instruction("RES 4,H", { reg!"h" = res!4(reg!"h"); }),
+            0xA5: Instruction("RES 4,L", { reg!"l" = res!4(reg!"l"); }),
+            0xA6: Instruction("RES 4,(HL)", { reg!"(hl)" = res!4(reg!"(hl)"); }),
+            0xA7: Instruction("RES 4,A", { reg!"a" = res!4(reg!"a"); }),
+
+            0xA8: Instruction("RES 5,B", { reg!"b" = res!5(reg!"b"); }),
+            0xA9: Instruction("RES 5,C", { reg!"c" = res!5(reg!"c"); }),
+            0xAA: Instruction("RES 5,D", { reg!"d" = res!5(reg!"d"); }),
+            0xAB: Instruction("RES 5,E", { reg!"e" = res!5(reg!"e"); }),
+            0xAC: Instruction("RES 5,H", { reg!"h" = res!5(reg!"h"); }),
+            0xAD: Instruction("RES 5,L", { reg!"l" = res!5(reg!"l"); }),
+            0xAE: Instruction("RES 5,(HL)", { reg!"(hl)" = res!5(reg!"(hl)"); }),
+            0xAF: Instruction("RES 5,A", { reg!"a" = res!5(reg!"a"); }),
+
+            0xB0: Instruction("RES 6,B", { reg!"b" = res!6(reg!"b"); }),
+            0xB1: Instruction("RES 6,C", { reg!"c" = res!6(reg!"c"); }),
+            0xB2: Instruction("RES 6,D", { reg!"d" = res!6(reg!"d"); }),
+            0xB3: Instruction("RES 6,E", { reg!"e" = res!6(reg!"e"); }),
+            0xB4: Instruction("RES 6,H", { reg!"h" = res!6(reg!"h"); }),
+            0xB5: Instruction("RES 6,L", { reg!"l" = res!6(reg!"l"); }),
+            0xB6: Instruction("RES 6,(HL)", { reg!"(hl)" = res!6(reg!"(hl)"); }),
+            0xB7: Instruction("RES 6,A", { reg!"a" = res!6(reg!"a"); }),
+
+            0xB8: Instruction("RES 7,B", { reg!"b" = res!7(reg!"b"); }),
+            0xB9: Instruction("RES 7,C", { reg!"c" = res!7(reg!"c"); }),
+            0xBA: Instruction("RES 7,D", { reg!"d" = res!7(reg!"d"); }),
+            0xBB: Instruction("RES 7,E", { reg!"e" = res!7(reg!"e"); }),
+            0xBC: Instruction("RES 7,H", { reg!"h" = res!7(reg!"h"); }),
+            0xBD: Instruction("RES 7,L", { reg!"l" = res!7(reg!"l"); }),
+            0xBE: Instruction("RES 7,(HL)", { reg!"(hl)" = res!7(reg!"(hl)"); }),
+            0xBF: Instruction("RES 7,A", { reg!"a" = res!7(reg!"a"); }),
+
+            0xC0: Instruction("SET 0,B", { reg!"b" = set!0(reg!"b"); }),
+            0xC1: Instruction("SET 0,C", { reg!"c" = set!0(reg!"c"); }),
+            0xC2: Instruction("SET 0,D", { reg!"d" = set!0(reg!"d"); }),
+            0xC3: Instruction("SET 0,E", { reg!"e" = set!0(reg!"e"); }),
+            0xC4: Instruction("SET 0,H", { reg!"h" = set!0(reg!"h"); }),
+            0xC5: Instruction("SET 0,L", { reg!"l" = set!0(reg!"l"); }),
+            0xC6: Instruction("SET 0,(HL)", { reg!"(hl)" = set!0(reg!"(hl)"); }),
+            0xC7: Instruction("SET 0,A", { reg!"a" = set!0(reg!"a"); }),
+
+            0xC8: Instruction("SET 1,B", { reg!"b" = set!1(reg!"b"); }),
+            0xC9: Instruction("SET 1,C", { reg!"c" = set!1(reg!"c"); }),
+            0xCA: Instruction("SET 1,D", { reg!"d" = set!1(reg!"d"); }),
+            0xCB: Instruction("SET 1,E", { reg!"e" = set!1(reg!"e"); }),
+            0xCC: Instruction("SET 1,H", { reg!"h" = set!1(reg!"h"); }),
+            0xCD: Instruction("SET 1,L", { reg!"l" = set!1(reg!"l"); }),
+            0xCE: Instruction("SET 1,(HL)", { reg!"(hl)" = set!1(reg!"(hl)"); }),
+            0xCF: Instruction("SET 1,A", { reg!"a" = set!1(reg!"a"); }),
+
+            0xD0: Instruction("SET 2,B", { reg!"b" = set!2(reg!"b"); }),
+            0xD1: Instruction("SET 2,C", { reg!"c" = set!2(reg!"c"); }),
+            0xD2: Instruction("SET 2,D", { reg!"d" = set!2(reg!"d"); }),
+            0xD3: Instruction("SET 2,E", { reg!"e" = set!2(reg!"e"); }),
+            0xD4: Instruction("SET 2,H", { reg!"h" = set!2(reg!"h"); }),
+            0xD5: Instruction("SET 2,L", { reg!"l" = set!2(reg!"l"); }),
+            0xD6: Instruction("SET 2,(HL)", { reg!"(hl)" = set!2(reg!"(hl)"); }),
+            0xD7: Instruction("SET 2,A", { reg!"a" = set!2(reg!"a"); }),
+
+            0xD8: Instruction("SET 3,B", { reg!"b" = set!3(reg!"b"); }),
+            0xD9: Instruction("SET 3,C", { reg!"c" = set!3(reg!"c"); }),
+            0xDA: Instruction("SET 3,D", { reg!"d" = set!3(reg!"d"); }),
+            0xDB: Instruction("SET 3,E", { reg!"e" = set!3(reg!"e"); }),
+            0xDC: Instruction("SET 3,H", { reg!"h" = set!3(reg!"h"); }),
+            0xDD: Instruction("SET 3,L", { reg!"l" = set!3(reg!"l"); }),
+            0xDE: Instruction("SET 3,(HL)", { reg!"(hl)" = set!3(reg!"(hl)"); }),
+            0xDF: Instruction("SET 3,A", { reg!"a" = set!3(reg!"a"); }),
+
+            0xE0: Instruction("SET 4,B", { reg!"b" = set!4(reg!"b"); }),
+            0xE1: Instruction("SET 4,C", { reg!"c" = set!4(reg!"c"); }),
+            0xE2: Instruction("SET 4,D", { reg!"d" = set!4(reg!"d"); }),
+            0xE3: Instruction("SET 4,E", { reg!"e" = set!4(reg!"e"); }),
+            0xE4: Instruction("SET 4,H", { reg!"h" = set!4(reg!"h"); }),
+            0xE5: Instruction("SET 4,L", { reg!"l" = set!4(reg!"l"); }),
+            0xE6: Instruction("SET 4,(HL)", { reg!"(hl)" = set!4(reg!"(hl)"); }),
+            0xE7: Instruction("SET 4,A", { reg!"a" = set!4(reg!"a"); }),
+
+            0xE8: Instruction("SET 5,B", { reg!"b" = set!5(reg!"b"); }),
+            0xE9: Instruction("SET 5,C", { reg!"c" = set!5(reg!"c"); }),
+            0xEA: Instruction("SET 5,D", { reg!"d" = set!5(reg!"d"); }),
+            0xEB: Instruction("SET 5,E", { reg!"e" = set!5(reg!"e"); }),
+            0xEC: Instruction("SET 5,H", { reg!"h" = set!5(reg!"h"); }),
+            0xED: Instruction("SET 5,L", { reg!"l" = set!5(reg!"l"); }),
+            0xEE: Instruction("SET 5,(HL)", { reg!"(hl)" = set!5(reg!"(hl)"); }),
+            0xEF: Instruction("SET 5,A", { reg!"a" = set!5(reg!"a"); }),
+
+            0xF0: Instruction("SET 6,B", { reg!"b" = set!6(reg!"b"); }),
+            0xF1: Instruction("SET 6,C", { reg!"c" = set!6(reg!"c"); }),
+            0xF2: Instruction("SET 6,D", { reg!"d" = set!6(reg!"d"); }),
+            0xF3: Instruction("SET 6,E", { reg!"e" = set!6(reg!"e"); }),
+            0xF4: Instruction("SET 6,H", { reg!"h" = set!6(reg!"h"); }),
+            0xF5: Instruction("SET 6,L", { reg!"l" = set!6(reg!"l"); }),
+            0xF6: Instruction("SET 6,(HL)", { reg!"(hl)" = set!6(reg!"(hl)"); }),
+            0xF7: Instruction("SET 6,A", { reg!"a" = set!6(reg!"a"); }),
+
+            0xF8: Instruction("SET 7,B", { reg!"b" = set!7(reg!"b"); }),
+            0xF9: Instruction("SET 7,C", { reg!"c" = set!7(reg!"c"); }),
+            0xFA: Instruction("SET 7,D", { reg!"d" = set!7(reg!"d"); }),
+            0xFB: Instruction("SET 7,E", { reg!"e" = set!7(reg!"e"); }),
+            0xFC: Instruction("SET 7,H", { reg!"h" = set!7(reg!"h"); }),
+            0xFD: Instruction("SET 7,L", { reg!"l" = set!7(reg!"l"); }),
+            0xFE: Instruction("SET 7,(HL)", { reg!"(hl)" = set!7(reg!"(hl)"); }),
+            0xFF: Instruction("SET 7,A", { reg!"a" = set!7(reg!"a"); }),
         ];
-        immutable tbitn = [&tbit!0, &tbit!1, &tbit!2, &tbit!3, &tbit!4, &tbit!5, &tbit!6, &tbit!7];
-        immutable resn = [&res!0, &res!1, &res!2, &res!3, &res!4, &res!5, &res!6, &res!7];
-        immutable setn = [&set!0, &set!1, &set!2, &set!3, &set!4, &set!5, &set!6, &set!7];
-        ubyte op = 0x40;
-        for (size_t i = 0; i < 8; i++) {
-            cbSet[op++] = Instruction(format("BIT %d,B", i), { tbitn[i](reg!"b"); });
-            cbSet[op++] = Instruction(format("BIT %d,C", i), { tbitn[i](reg!"c"); });
-            cbSet[op++] = Instruction(format("BIT %d,D", i), { tbitn[i](reg!"d"); });
-            cbSet[op++] = Instruction(format("BIT %d,E", i), { tbitn[i](reg!"e"); });
-            cbSet[op++] = Instruction(format("BIT %d,H", i), { tbitn[i](reg!"h"); });
-            cbSet[op++] = Instruction(format("BIT %d,L", i), { tbitn[i](reg!"l"); });
-            cbSet[op++] = Instruction(format("BIT %d,(HL)", i), { tbitn[i](reg!"(hl)"); });
-            cbSet[op++] = Instruction(format("BIT %d,A", i), { tbitn[i](reg!"a"); });
-        }
-        assert(op == 0x80);
-        for (size_t i = 0; i < 8; i++) {
-            cbSet[op++] = Instruction(format("RES %d,B", i), { reg!"b" = resn[i](reg!"b"); });
-            cbSet[op++] = Instruction(format("RES %d,C", i), { reg!"c" = resn[i](reg!"c"); });
-            cbSet[op++] = Instruction(format("RES %d,D", i), { reg!"d" = resn[i](reg!"d"); });
-            cbSet[op++] = Instruction(format("RES %d,E", i), { reg!"e" = resn[i](reg!"e"); });
-            cbSet[op++] = Instruction(format("RES %d,H", i), { reg!"h" = resn[i](reg!"h"); });
-            cbSet[op++] = Instruction(format("RES %d,L", i), { reg!"l" = resn[i](reg!"l"); });
-            cbSet[op++] = Instruction(format("RES %d,(HL)", i), { reg!"(hl)" = resn[i](reg!"(hl)"); });
-            cbSet[op++] = Instruction(format("RES %d,A", i), { reg!"a" = resn[i](reg!"a"); });
-        }
-        assert(op == 0xC0);
-        for (size_t i = 0; i < 8; i++) {
-            cbSet[op++] = Instruction(format("SET %d,B", i), { reg!"b" = setn[i](reg!"b"); });
-            cbSet[op++] = Instruction(format("SET %d,C", i), { reg!"c" = setn[i](reg!"c"); });
-            cbSet[op++] = Instruction(format("SET %d,D", i), { reg!"d" = setn[i](reg!"d"); });
-            cbSet[op++] = Instruction(format("SET %d,E", i), { reg!"e" = setn[i](reg!"e"); });
-            cbSet[op++] = Instruction(format("SET %d,H", i), { reg!"h" = setn[i](reg!"h"); });
-            cbSet[op++] = Instruction(format("SET %d,L", i), { reg!"l" = setn[i](reg!"l"); });
-            cbSet[op++] = Instruction(format("SET %d,(HL)", i), { reg!"(hl)" = setn[i](reg!"(hl)"); });
-            cbSet[op++] = Instruction(format("SET %d,A", i), { reg!"a" = setn[i](reg!"a"); });
-        }
-        assert(op == 0x00);
         cbSet.rehash();
     }
 
