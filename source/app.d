@@ -1,6 +1,7 @@
 module gameboy.app;
 
 import std.stdio;
+import core.thread;
 import dsfml.system;
 import dsfml.window;
 import dsfml.graphics;
@@ -8,48 +9,49 @@ import gameboy.cpu;
 import gameboy.memory;
 import gameboy.video;
 import gameboy.rom;
+import gameboy.input;
 import gameboy.utils;
 
 void main(string[] args)
 {
-    readROMs();
-    auto cart = Cartage.fromFile("roms/Tetris.gb");
+    enum PixelSize = 1;
+    debug readROMs();
+    auto cart = Cartage.fromFile("roms/DrMario.gb");
     auto ram = new Memory;
     ram.loadCartage(cart);
     auto cpu = new Processor(ram);
     auto gpu = new Video(ram);
+    auto input = new Input(ram);
     cpu.boot();
 
-    enum PixelSize = 2;
-    immutable screenSize = Vector2u(160, 144) * PixelSize;
+    auto sprite = new Sprite;
+    sprite.setTexture(gpu.texture);
+    sprite.scale(Vector2f(PixelSize, PixelSize));
 
+    immutable screenSize = Vector2u(Video.Width, Video.Height) * PixelSize;
     auto window = new RenderWindow(VideoMode(screenSize.x, screenSize.y), cart.title.capitalized, Window.Style.Close);
 
-    //test triangle
-    immutable triangle = [Vertex(Vector2f(0, 0), Color.Red),
-                          Vertex(Vector2f(screenSize.x, 0), Color.Green),
-                          Vertex(Vector2f(screenSize.x, screenSize.y), Color.White),
-                          Vertex(Vector2f(0, screenSize.y), Color.Blue)];
+    auto thr = new core.thread.Thread({
+        while (true) {
+            debug debugCPU(cpu);
+            cpu.step();
+            gpu.step(8);
+            cpu.fireInterrupts();
+        }
+    });
+    thr.isDaemon = true;
+    thr.start();
 
-    while (window.isOpen())
-    {
+    while (window.isOpen()) {
         Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == event.EventType.Closed)
-            {
+        while (window.pollEvent(event)) {
+            if (event.type == event.EventType.Closed) {
                 window.close();
             }
+            input.onevent(event);
         }
-        debug debugCPU(cpu);
-        debug debugGPU(gpu);
-        cpu.step();
-        gpu.step(1);
-        cpu.fireInterrupts();
-        //update here
         window.clear();
-        //draw here
-        window.draw(triangle, PrimitiveType.Quads);
+        window.draw(sprite);
         window.display();
     }
 }
@@ -67,19 +69,8 @@ void debugCPU(Processor cpu) {
     file.writefln("PC: $%04X", cpu.reg!"pc");
 }
 
-void debugGPU(Video gpu) {
-    auto frame = new Image;
-    frame.create(Video.Width, Video.Height, Color.Black);
-    for (int y = 0; y < Video.Height; y++) {
-        for (int x = 0; x < Video.Width; x++) {
-            frame.setPixel(x, y, gpu.buffer[y * Video.Width + x]);
-        }
-    }
-    frame.saveToFile("buffer.png");
-}
-
 void readROMs() {
-    import std.file;
+    import std.file : dirEntries, SpanMode;
     foreach (string filename; dirEntries("roms", "*.gb", SpanMode.shallow)) {
         writeln();
         auto cart = Cartage.fromFile(filename);
