@@ -1,44 +1,44 @@
 module gameboy.video;
 
-import dsfml.graphics.color;
+import dsfml.graphics : Color, Texture;
 import gameboy.memory;
 import gameboy.utils;
 
-struct Sprite
-{
-    ubyte y;
-    ubyte x;
-    ubyte tile;
-    ubyte options;
-@property:
-    ubyte priority() {
-        return options.bit!7;
-    }
-    ubyte flipY() {
-        return options.bit!6;
-    }
-    ubyte flipX() {
-        return options.bit!5;
-    }
-    ubyte palette() {
-        return options.bit!4;
-    }
-}
-
-unittest {
-    const ubyte[4] data = [0x10, 0x20, 0x40, 0xA0];
-    auto s = cast(Sprite)data;
-    assert(s.y == 16);
-    assert(s.x == 32);
-    assert(s.tile == 64);
-    assert(s.priority == 1);
-    assert(s.flipY == 0);
-    assert(s.flipX == 1);
-    assert(s.palette == 0);
-}
-
 class Video
 {
+    struct Sprite
+    {
+        ubyte y;
+        ubyte x;
+        ubyte tile;
+        ubyte options;
+    @property:
+        ubyte priority() {
+            return options.bit!7;
+        }
+        ubyte flipY() {
+            return options.bit!6;
+        }
+        ubyte flipX() {
+            return options.bit!5;
+        }
+        ubyte palette() {
+            return options.bit!4;
+        }
+    }
+
+    unittest {
+        const ubyte[4] data = [0x10, 0x20, 0x40, 0xA0];
+        auto s = cast(Sprite)data;
+        assert(s.y == 16);
+        assert(s.x == 32);
+        assert(s.tile == 64);
+        assert(s.priority == 1);
+        assert(s.flipY == 0);
+        assert(s.flipX == 1);
+        assert(s.palette == 0);
+    }
+
     enum Mode
     {
         HBLANK,
@@ -70,12 +70,14 @@ class Video
         mode = Mode.HBLANK;
         vram = new ubyte[0x2000];
         oam = new ubyte[0x100];
+        canvas = new Texture;
+        canvas.create(Width, Height);
         mount();
     }
 
     @property
-    ref const(Color[Width * Height]) buffer() inout {
-        return this.framebuffer;
+    const(Texture) texture() inout {
+        return this.canvas;
     }
 
     void mount() {
@@ -104,6 +106,7 @@ class Video
                             flags.bit!0 = 1;
                             mem[0xFF0F] = flags;
                         }
+                        render();
                         mode = Mode.VBLANK;
                     } else {
                         mode = Mode.OAM;
@@ -173,16 +176,22 @@ private:
         ushort tile = vram[mapOffset + lineOffset];
         //draw background
         auto scanlineRow = new ubyte[Width];
+        if (control.bit!4 && tile < 128) {
+            tile += 256;
+        }
         for (size_t i = 0; i < Width; i++) {
             immutable ubyte color = tiles[x][y][tile];
             scanlineRow[i] = color;
-            framebuffer[pixelOffset] = backgroundPalette[color];
+            setColor(pixelOffset, backgroundPalette[color]);
             pixelOffset++;
             x++;
             if (x == 8) {
                 x = 0;
                 lineOffset = (lineOffset + 1) & 0b11111;
                 tile = vram[mapOffset + lineOffset];
+                if (control.bit!4 && tile < 128) {
+                    tile += 256;
+                }
             }
         }
         //draw sprites
@@ -206,13 +215,24 @@ private:
                         }
                         ubyte color = tiles[tileCol][tileRow][sprite.tile];
                         if (color) {
-                            framebuffer[pixelOffset] = spritePalette[sprite.palette][color];
+                            setColor(pixelOffset, spritePalette[sprite.palette][color]);
                         }
                         pixelOffset++;
                     }
                 }
             }
         }
+    }
+
+    void render() {
+        canvas.updateFromPixels(framebuffer, Width, Height, 0, 0);
+    }
+
+    void setColor(size_t index, Color color) {
+        framebuffer[index * 4 + 0] = color.r;
+        framebuffer[index * 4 + 1] = color.g;
+        framebuffer[index * 4 + 2] = color.b;
+        framebuffer[index * 4 + 3] = color.a;
     }
 
 private:
@@ -223,6 +243,7 @@ private:
     ubyte[384][8][8] tiles;
     ulong ticks;
     Mode mode;
-    Color[Width * Height] framebuffer;
+    ubyte[Width * Height * 4] framebuffer;
+    Texture canvas;
     Memory mem;
 }
