@@ -744,6 +744,11 @@ class Processor
         assert(cpu.reg!"f" == 0b1111_0000);
     }
 
+    @property
+    size_t time() inout {
+        return this.ticks;
+    }
+
     void boot() {
         reg!"af" = 0x01B0;
         reg!"bc" = 0x0013;
@@ -796,11 +801,13 @@ class Processor
         assert(cpu.reg!"pc" == 0x100);
     }
 
-    void step() {
+    size_t step() {
         if (stopped)
-            return;
+            return 0;
         immutable opcode = mem[pc++];
+        immutable old = ticks;
         step(opSet, opTicks, opcode);
+        return ticks - old;
     }
 
     private void step(const Instruction[ubyte] set, ref const ubyte[0x100] times, ubyte opcode) {

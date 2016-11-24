@@ -31,17 +31,6 @@ void main(string[] args)
     immutable screenSize = Vector2u(Video.Width, Video.Height) * PixelSize;
     auto window = new RenderWindow(VideoMode(screenSize.x, screenSize.y), cart.title.capitalized, Window.Style.Close);
 
-    auto thr = new core.thread.Thread({
-        while (true) {
-            debug debugCPU(cpu);
-            cpu.step();
-            gpu.step(8);
-            cpu.fireInterrupts();
-        }
-    });
-    thr.isDaemon = true;
-    thr.start();
-
     while (window.isOpen()) {
         Event event;
         while (window.pollEvent(event)) {
@@ -50,6 +39,15 @@ void main(string[] args)
             }
             input.onevent(event);
         }
+
+        immutable end = cpu.time + 70_224;
+        do {
+            debug debugCPU(cpu);
+            immutable dt = cpu.step();
+            gpu.step(dt);
+            cpu.fireInterrupts();
+        } while (cpu.time < end);
+
         window.clear();
         window.draw(sprite);
         window.display();
