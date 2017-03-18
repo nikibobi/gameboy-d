@@ -12,11 +12,14 @@ import gameboy.rom;
 import gameboy.input;
 import gameboy.utils;
 
+enum DefaultFile = "roms/DrMario.gb";
+enum PixelSize = 1;
+
 void main(string[] args)
 {
-    enum PixelSize = 1;
     debug readROMs();
-    auto cart = Cartage.fromFile("roms/DrMario.gb");
+    immutable filename = (args.length > 1 ? args[1] : DefaultFile);
+    auto cart = Cartage.fromFile(filename);
     auto ram = new Memory;
     ram.loadCartage(cart);
     auto cpu = new Processor(ram);
@@ -57,8 +60,11 @@ void main(string[] args)
 void debugCPU(Processor cpu) {
     auto file = File("debug.txt", "w");
     scope(exit) file.close();
+    char flag(char f)() {
+        return cpu.flag!f ? f : '-';
+    }
     file.writefln("A: $%02X", cpu.reg!"a");
-    file.writefln("F: %s%s%s%s", (cpu.flag!'z'?'z':'-'), (cpu.flag!'n'?'n':'-'), (cpu.flag!'h'?'h':'-'), (cpu.flag!'c'?'c':'-'));
+    file.writefln("F: %s%s%s%s", flag!'z', flag!'n', flag!'h', flag!'c');
     file.writefln("BC: $%04X", cpu.reg!"bc");
     file.writefln("DE: $%04X", cpu.reg!"de");
     file.writefln("HL: $%04X", cpu.reg!"hl");
@@ -69,12 +75,14 @@ void debugCPU(Processor cpu) {
 
 void readROMs() {
     import std.file : dirEntries, SpanMode;
+    immutable yn = (bool b) => b ? "yes" : "no";
+
     foreach (string filename; dirEntries("roms", "*.gb", SpanMode.shallow)) {
         writeln();
         auto cart = Cartage.fromFile(filename);
         writeln("Title: ", cart.title);
-        writeln("Color: ", cart.isColor ? "yes" : "no");
-        writeln("Super: ", cart.isSuper ? "yes" : "no");
+        writeln("Color: ", yn(cart.isColor));
+        writeln("Super: ", yn(cart.isSuper));
         writeln("Cartage: ", cart.type);
         writefln("ROM size: %dKB %d banks", cart.romSize, cart.romBanks);
         writefln("RAM size: %dKB", cart.ramSize);
