@@ -93,6 +93,8 @@ private:
 
     void axisEvent(int axis, int position) {
         switch (axis) {
+            case 0:
+            case 2:
             case 6:
                 switch (position) {
                     case -100:
@@ -109,6 +111,8 @@ private:
                         break;
                 }
                 break;
+            case 1:
+            case 3:
             case 7:
                 switch (position) {
                     case -100:
