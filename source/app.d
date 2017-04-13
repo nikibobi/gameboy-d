@@ -49,6 +49,7 @@ void main(string[] args)
             immutable dt = cpu.step();
             gpu.step(dt);
             cpu.fireInterrupts();
+            debug debugInput(ram);
         } while (cpu.time < end);
 
         window.clear();
@@ -71,6 +72,30 @@ void debugCPU(Processor cpu) {
     file.writefln("(HL): $%02X", cpu.reg!"(hl)");
     file.writefln("SP: $%04X", cpu.reg!"sp");
     file.writefln("PC: $%04X", cpu.reg!"pc");
+}
+
+void debugInput(Memory ram) {
+    ubyte i;
+    ram[0xFF00] = 1 << 4;
+    i = ram[0xFF00];
+    if (i != 0xF)
+    {
+        write(i.bit!0 ? "_" : "A");
+        write(i.bit!1 ? "_" : "B");
+        write(i.bit!2 ? "_" : "S");
+        write(i.bit!3 ? "_" : "~");
+        writeln();
+    }
+    ram[0xFF00] = 1 << 5;
+    i = ram[0xFF00];
+    if (i != 0xF)
+    {
+        write(i.bit!0 ? "_" : "▶");
+        write(i.bit!1 ? "_" : "◀");
+        write(i.bit!2 ? "_" : "▲");
+        write(i.bit!3 ? "_" : "▼");
+        writeln();
+    }
 }
 
 void readROMs() {
