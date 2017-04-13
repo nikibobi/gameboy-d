@@ -8,10 +8,29 @@ import core.exception : RangeError;
 import gameboy.rom;
 import gameboy.utils;
 
+struct Range
+{
+    size_t begin;
+    size_t end;
+
+    invariant
+    {
+        assert(begin < end);
+    }
+
+    int opCmp(ref const Range r) const
+    {
+        if (this.begin < r.begin)
+            return -1;
+        if (this.begin > r.begin)
+            return +1;
+        return 0;
+    }
+}
+
 class Memory
 {
     alias T = ushort;
-    alias Range = Tuple!(size_t, "begin", size_t, "end");
     alias readfn = ubyte delegate(size_t);
     alias writefn = void delegate(size_t, ubyte);
 
