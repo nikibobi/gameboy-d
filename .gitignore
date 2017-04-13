@@ -10,3 +10,4 @@ __test__library__
 *.txt
 roms/*
 dsfml/*
+.vscode/*
