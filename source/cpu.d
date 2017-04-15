@@ -836,35 +836,43 @@ class Processor
         ticks += times[opcode];
     }
 
+    enum Interrupts {
+        VBlank,
+        LCDStat,
+        Timer,
+        Serial,
+        Joypad
+    }
+
+    unittest {
+        static assert(Interrupts.VBlank == 0);
+        static assert(Interrupts.LCDStat == 1);
+        static assert(Interrupts.Timer == 2);
+        static assert(Interrupts.Serial == 3);
+        static assert(Interrupts.Joypad == 4);
+
+        debug writeln("Interrupts:");
+        for (auto i = Interrupts.min; i <= Interrupts.max; i++) {
+            debug writefln("%s 0x%X", i, 0x40 + 0x8 * i);
+        }
+    }
+
+    void checkInterrupt(Interrupts i)() {
+        if ((interruptEnable & interruptFlags).bit!i) {
+            interruptFlags.bit!i = 0;
+            interrupt!(0x40 + 0x8 * i)();
+        }
+    }
+
     void fireInterrupts() {
         if (!interrupts)
             return;
-        ubyte fired = interruptEnable & interruptFlags;
-        // Vertical blank
-        if (fired.bit!0) {
-            interruptFlags.bit!0 = 0;
-            interrupt!0x40();
-        }
-        // LCD status
-        if (fired.bit!1) {
-            interruptFlags.bit!1 = 0;
-            interrupt!0x48();
-        }
-        // Timer overflow
-        if (fired.bit!2) {
-            interruptFlags.bit!2 = 0;
-            interrupt!0x50();
-        }
-        // Serial link
-        if (fired.bit!3) {
-            interruptFlags.bit!3 = 0;
-            interrupt!0x58();
-        }
-        // Joypad press
-        if (fired.bit!4) {
-            interruptFlags.bit!4 = 0;
-            interrupt!0x60();
-        }
+
+        checkInterrupt!(Interrupts.VBlank)();
+        checkInterrupt!(Interrupts.LCDStat)();
+        checkInterrupt!(Interrupts.Timer)();
+        checkInterrupt!(Interrupts.Serial)();
+        checkInterrupt!(Interrupts.Joypad)();
     }
 
 private:
