@@ -32,7 +32,7 @@ void main(string[] args)
     sprite.scale(Vector2f(PixelSize, PixelSize));
 
     immutable screenSize = Vector2u(Video.Width, Video.Height) * PixelSize;
-    auto window = new RenderWindow(VideoMode(screenSize.x, screenSize.y), cart.title.capitalized, Window.Style.Close);
+    auto window = new RenderWindow(VideoMode(screenSize.x, screenSize.y), cart.header.title.capitalized, Window.Style.Close);
 
     while (window.isOpen()) {
         Event event;
@@ -105,15 +105,15 @@ void readROMs() {
     foreach (string filename; dirEntries("roms", "*.gb", SpanMode.shallow)) {
         writeln();
         auto cart = Cartage.fromFile(filename);
-        writeln("Title: ", cart.title);
-        writeln("Color: ", yn(cart.isColor));
-        writeln("Super: ", yn(cart.isSuper));
-        writeln("Cartage: ", cart.type);
-        writefln("ROM size: %dKB %d banks", cart.romSize, cart.romBanks);
-        writefln("RAM size: %dKB", cart.ramSize);
-        writeln("Destination: ", cart.destination);
-        writeln("License: ", cart.license);
-        writeln("Version: ", cart.ver);
+        writeln("Title: ", cart.header.title);
+        writeln("Color: ", yn(cart.header.isColor));
+        writeln("Super: ", yn(cart.header.isSuper));
+        writeln("Cartage: ", cart.header.type);
+        writefln("ROM size: %dKB %d banks", cart.header.romSize, cart.header.romBanks);
+        writefln("RAM size: %dKB", cart.header.ramSize);
+        writeln("Destination: ", cart.header.destination);
+        writeln("License: ", cart.header.license);
+        writeln("Version: ", cart.header.ver);
     }
 }
 
