@@ -163,7 +163,7 @@ class Memory
     }
 
     private static bool inRange(size_t address, Range range) {
-        return range.begin <= address && address < range.end;
+        return gameboy.utils.inRange(address, range.begin, range.end);
     }
 
 private:

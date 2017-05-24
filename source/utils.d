@@ -124,3 +124,7 @@ unittest {
     static assert(!inType!byte(-129));
     static assert(!inType!byte(128));
 }
+
+bool inRange(size_t address, size_t begin, size_t end) {
+    return begin <= address && address < end;
+}
