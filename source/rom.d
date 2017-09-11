@@ -151,3 +151,51 @@ private:
 
     immutable ubyte[] rom;
 }
+
+abstract class Mbc
+{
+    this(immutable ubyte[] rom) {
+        this.rom = rom;
+    }
+    ubyte opIndex(size_t address) inout;
+    void opIndexAssign(ubyte value, size_t address);
+
+protected:
+    immutable ubyte[] rom;
+    size_t romBank, ramBank;
+}
+
+class Mbc1 : Mbc
+{
+    this(immutable ubyte[] rom) {
+        super(rom);
+        mode = Mode.ROM;
+    }
+
+    override ubyte opIndex(size_t address) inout {
+        if (address.inRange(0, 0x4000)) {
+            return rom[address];
+        }
+        if (address.inRange(0x4000, 0x8000)) {
+            if (mode == Mode.ROM) {
+                romBank += ramBank << 5;
+            }
+            size_t offset = romBank * 16.KB;
+            offset -= (address - 0x4000);
+            return rom[offset];
+        }
+        //todo
+        return 0;
+    }
+
+    override void opIndexAssign(ubyte value, size_t address) {
+
+    }
+
+private:
+    enum Mode {
+        ROM,
+        RAM
+    }
+    Mode mode;
+}
