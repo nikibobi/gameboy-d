@@ -208,7 +208,7 @@ private:
                 }
 
                 for (x = 0; x < 8; x++) {
-                    if (sx + x >= 0 && sx + x < Width && (~sprite.priority || !scanlineRow[sx + x])) {
+                    if (sx + x >= 0 && sx + x < Width && (sprite.priority == 0 || !scanlineRow[sx + x])) {
                         auto tileCol = cast(ubyte)x;
                         if (sprite.flipX) {
                             tileCol = cast(ubyte)(7 - tileCol);

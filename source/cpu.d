@@ -1058,7 +1058,7 @@ protected:
     }
 
     void cpl() {
-        reg!"a" = ~reg!"a";
+        reg!"a" = cast(ubyte)~cast(int)reg!"a";
         flag!'n' = 1;
         flag!'h' = 1;
     }
