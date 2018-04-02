@@ -154,22 +154,49 @@ private:
 
 abstract class Mbc
 {
-    this(immutable ubyte[] rom) {
+    static immutable size_t RomBankSize = 16.KB;
+    static immutable size_t RamBankSize = 8.KB;
+
+    this(immutable ubyte[] rom, size_t ramSize) {
         this.rom = rom;
+        ram = new ubyte[ramSize];
+        ramEnable = false;
     }
     ubyte opIndex(size_t address) inout;
     void opIndexAssign(ubyte value, size_t address);
 
 protected:
     immutable ubyte[] rom;
+    ubyte[] ram;
     size_t romBank, ramBank;
+    bool ramEnable;
+}
+
+class NoMbc : Mbc
+{
+    this(immutable ubyte[] rom) {
+        super(rom, 0);
+    }
+
+    override ubyte opIndex(size_t address) inout {
+        if (address.inRange(0, 0x8000)) {
+            return rom[address];
+        }
+        return 0;
+    }
+
+    override void opIndexAssign(ubyte value, size_t address) {
+        
+    }
 }
 
 class Mbc1 : Mbc
 {
-    this(immutable ubyte[] rom) {
-        super(rom);
+    this(immutable ubyte[] rom, size_t ramSize) {
+        super(rom, ramSize);
         mode = Mode.ROM;
+        romBank = 1;
+        ramBank = 0;
     }
 
     override ubyte opIndex(size_t address) inout {
@@ -177,25 +204,101 @@ class Mbc1 : Mbc
             return rom[address];
         }
         if (address.inRange(0x4000, 0x8000)) {
+            size_t romBank = this.romBank;
             if (mode == Mode.ROM) {
                 romBank += ramBank << 5;
             }
-            size_t offset = romBank * 16.KB;
-            offset -= (address - 0x4000);
+            size_t offset = romBank * RomBankSize;
+            offset += address - 0x4000;
             return rom[offset];
         }
-        //todo
+        if (address.inRange(0xA000, 0xC000)) {
+            size_t ramBank = 0;
+            if (mode == Mode.RAM) {
+                ramBank = this.ramBank;
+            }
+            size_t offset = ramBank * RamBankSize;
+            offset += address - 0xA000;
+            return ram[offset];
+        }
         return 0;
     }
 
     override void opIndexAssign(ubyte value, size_t address) {
-
+        if (address.inRange(0, 0x2000)) {
+            ramEnable = ((value & 0x0A) == 0x0A);
+        } else if (address.inRange(0x2000, 0x4000)) {
+            value &= 0x1F;
+            if (value == 0) {
+                value = 1;
+            }
+            romBank = value;
+        } else if (address.inRange(0x4000, 0x6000)) {
+            ramBank = value & 0x03;
+        } else if (address.inRange(0x6000, 0x8000)) {
+            mode = cast(Mode)(value & 0x01);
+        } else if (address.inRange(0xA000, 0xC000)) {
+            size_t ramBank = 0;
+            if (mode == Mode.RAM) {
+                ramBank = this.ramBank;
+            }
+            size_t offset = ramBank * RamBankSize;
+            offset += address - 0xA000;
+            ram[offset] = value;
+        }
     }
 
 private:
     enum Mode {
-        ROM,
-        RAM
+        ROM = 0,
+        RAM = 1
     }
     Mode mode;
+}
+
+class Mbc2 : Mbc
+{
+    this(immutable ubyte[] rom, size_t ramSize) {
+        super(rom, ramSize);
+        romBank = 1;
+    }
+
+    override ubyte opIndex(size_t address) inout {
+        if (address.inRange(0, 0x4000)) {
+            return rom[address];
+        }
+        if (address.inRange(0x4000, 0x8000)) {
+            size_t offset = romBank * RomBankSize;
+            offset += address - 0x4000;
+        }
+        if (address.inRange(0xA000, 0xA200)) {
+            if (ramEnable) {
+                size_t offset = address - 0xA000;
+                return ram[offset] & 0x0F;
+            }
+        }
+        return 0;
+    }
+
+    override void opIndexAssign(ubyte value, size_t address) {
+        if (address.inRange(0, 0x2000)) {
+            if ((address & 0x0100) == 0) {
+                ramEnable = ((value & 0x0A) == 0x0A);
+            }
+        } else if (address.inRange(0x2000, 0x4000)) {
+            if ((address & 0x0100) != 0) {
+                value &= 0x0F;
+                if (value == 0) {
+                    value = 1;
+                }
+                romBank = value;
+            }
+        } else if (address.inRange(0xA000, 0xC000)) {
+            if (ramEnable) {
+                value &= 0x0F;
+                size_t offset = address - 0xA000;
+                ram[offset] = value;
+            }
+        }
+    }
 }
