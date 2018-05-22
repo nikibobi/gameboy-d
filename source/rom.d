@@ -302,3 +302,81 @@ class Mbc2 : Mbc
         }
     }
 }
+
+class Mbc3 : Mbc
+{
+    this(immutable ubyte[] rom, size_t ramSize) {
+        super(rom, ramSize);
+        romBank = 1;
+        ramBank = 0;
+        ramEnable = false;
+        rtcEnable = false;
+        rtcSelect = 0x08;
+        rtc = [
+            0x08: 0,
+            0x09: 0,
+            0x0A: 0,
+            0x0B: 0,
+            0x0C: 0
+        ];
+    }
+
+    override ubyte opIndex(size_t address) inout {
+        if (address.inRange(0, 0x4000)) {
+            return rom[address];
+        }
+        if (address.inRange(0x4000, 0x8000)) {
+            size_t romBank = this.romBank;
+            size_t offset = romBank * RomBankSize;
+            offset += address - 0x4000;
+            return rom[offset];
+        }
+        if (address.inRange(0xA000, 0xC000)) {
+            if (ramEnable) {
+                if (rtcEnable) {
+                    return rtc[rtcSelect];
+                } else {
+                    size_t ramBank = this.ramBank;
+                    size_t offset = ramBank * RamBankSize;
+                    offset += address - 0xA000;
+                    return ram[offset];
+                }
+            }
+        }
+        return 0;
+    }
+
+    override void opIndexAssign(ubyte value, size_t address) {
+        if (address.inRange(0, 0x2000)) {
+            ramEnable = ((value & 0x0A) == 0x0A);
+        } else if (address.inRange(0x2000, 0x4000)) {
+            value &= 0x7F;
+            if (value == 0) {
+                value = 1;
+            }
+            romBank = value;
+        } else if (address.inRange(0x4000, 0x6000)) {
+            rtcEnable = false;
+            if (value <= 0x03) {
+                ramBank = value & 0x03;
+            } else if (value >= 0x08 && value <= 0x0C) {
+                rtcEnable = true;
+                rtcSelect = value;
+            }
+        } else if (address.inRange(0x6000, 0x8000)) {
+            // TODO: latch the RTC registers
+        } else if (address.inRange(0xA000, 0xC000)) {
+            if (ramEnable) {
+                size_t ramBank = this.ramBank;
+                size_t offset = ramBank * RamBankSize;
+                offset += address - 0xA000;
+                ram[offset] = value;
+            }
+        }
+    }
+
+private:
+    bool rtcEnable;
+    size_t rtcSelect;
+    ubyte[size_t] rtc;
+}
