@@ -380,3 +380,62 @@ private:
     size_t rtcSelect;
     ubyte[size_t] rtc;
 }
+
+class Mbc5 : Mbc
+{
+    this(immutable ubyte[] rom, size_t ramSize) {
+        super(rom, ramSize);
+        romBank = 0;
+        ramBank = 0;
+        ramEnable = false;
+        rumblePak = false;
+        rumbling = false;
+    }
+
+    override ubyte opIndex(size_t address) inout {
+        if (address.inRange(0, 0x4000)) {
+            return rom[address];
+        }
+        if (address.inRange(0x4000, 0x8000)) {
+            size_t romBank = this.romBank;
+            size_t offset = romBank * RomBankSize;
+            offset += address - 0x4000;
+            return rom[offset];
+        }
+        if (address.inRange(0xA000, 0xC000)) {
+            if (ramEnable) {
+                size_t ramBank = this.ramBank;
+                size_t offset = ramBank * RamBankSize;
+                offset += address - 0xA000;
+                return ram[offset];
+            }
+        }
+        return 0;
+    }
+
+    override void opIndexAssign(ubyte value, size_t address) {
+        if (address.inRange(0, 0x2000)) {
+            ramEnable = ((value & 0x0A) == 0x0A);
+        } else if (address.inRange(0x2000, 0x3000)) {
+            romBank &= 0xFF00;
+            romBank += value;
+        } else if (address.inRange(0x3000, 0x4000)) {
+            romBank &= 0xFF;
+            romBank += (value & 0x01) << 8;
+        } else if (address.inRange(0x4000, 0x6000)) {
+            size_t ramMask = rumblePak ? 0x07 : 0x0F;
+            ramBank = value & ramMask;
+            if ((value & 0x08) != 0) {
+                rumbling = !rumbling;
+            }
+        } else if (address.inRange(0xA000, 0xC000)) {
+            size_t ramBank = this.ramBank;
+            size_t offset = ramBank * RamBankSize;
+            offset += address - 0xA000;
+            ram[offset] = value;
+        }
+    }
+
+private:
+    bool rumbling, rumblePak;
+}
