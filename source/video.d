@@ -88,6 +88,7 @@ class Video
         mem.mount(scrollY, 0xFF42);
         mem.mount(scrollX, 0xFF43);
         mem.mount!'r'(scanline, 0xFF44);
+        mem.mount(&oamToDmaTransfer, 0xFF46);
         mem.mount(mountPalette(backgroundPalette), 0xFF47);
         mem.mount(mountPalette(spritePalette[0]), 0xFF48);
         mem.mount(mountPalette(spritePalette[1]), 0xFF49);
@@ -153,6 +154,12 @@ private:
         vram[address] = value;
         if (address <= 0x17FF) {
             updateTiles(address + 0x8000, value);
+        }
+    }
+
+    void oamToDmaTransfer(size_t address, ubyte value) {
+        for (size_t i = 0; i < 160; i++) {
+            mem[0xFE00 + i] = mem[(value << 8) + i];
         }
     }
 
